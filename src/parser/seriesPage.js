@@ -87,7 +87,6 @@ const getRelatedSerie = ($) => {
 
 const getRecommendations = ($) => {
     return $('#editassociated').siblings('.seriesother').next('.seriesother').nextUntil('.seriesother').map((i, el) => {
-        // return el = $(el).text().trim()
         if (($(el).text().trim() != '')) return $(el).text().trim()
     }).get()
 }
@@ -101,7 +100,6 @@ const getType = ($) => {
 }
 
 const getGenres = ($) => {
-    // seriesgenre
     return $('#seriesgenre').children().map((i, el) => {
         el = $(el);
         return {
