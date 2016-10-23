@@ -1,14 +1,50 @@
 import "babel-polyfill";
-import {getSearchData} from './parser/searchPage';
-import {getSerieData} from './parser/seriesPage' 
+import {getSearchData, getSerieData, getIndexData} from './parser';
 
 // (async function test() { 
-//     let res = await getSearchData("antimagic", 3);
-//     console.log(res);
+//     try {
+//         let res = await getSearchData("antimagic", 1);
+//         console.log(res);
+//     }
+//     catch(e) {
+//         console.log("Error :", e);
+//     }
 // })()
+// getSearchData("antimagic", 1).then(res => {
+//     console.log(res);
+// }, err => {
+//     console.log(err);
+// })
 
-(async function test2() {
-    let res = await getSerieData("Absolute Duo", 2);
-    // let res = await getSerieData("mahouka-koukou-no-rettousei-x-sword-art-online");
-    console.log(res);
+
+// (async function test2() {
+//     try {
+//         let res = await getSerieData("Absolute Duo", 2);
+//         // let res = await getSerieData("mahouka-koukou-no-rettousei-x-sword-art-online");
+//         console.log(res);
+//     }
+//     catch(e) {
+//         console.log("Error :", e);
+//     }
+// })()
+// getSerieData("Absolute Duo", 2).then(res => {
+//     console.log(res);
+// }, err => {
+//     console.log(err);
+// })
+
+
+(async function test3() { 
+    try {
+        let res = await getIndexData();
+        console.log(res);
+    }
+    catch(e) {
+        console.log("Error :", e);
+    }
 })()
+// getIndexData().then(res => {
+//     console.log(res);
+// }, err => {
+//     console.log(err);
+// })

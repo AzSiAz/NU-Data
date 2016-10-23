@@ -45,3 +45,5 @@ log/
 # compiled output
 dist/
 docs/
+
+.DS_Store
