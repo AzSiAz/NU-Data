@@ -3,11 +3,13 @@ import requestPromise from 'request-promise';
 import cheerio from 'cheerio';
 import moment from 'moment';
 
-export async function getSerieData(serie = undefined, page = 1) {
-    if (serie == undefined) throw Error("You must specify a serie");
-    serie = sanatizeSerieName(serie);
-    let $ = await getPageWithData(serie, page);
-    return await parseSeriePage($);
+export function getSerieData(serie = undefined, page = 1) {
+    return new Promise(async (res, rej) => {
+        if (serie == undefined)  rej(new Error("You must specify a serie"));
+        serie = sanatizeSerieName(serie);
+        let $ = await getPageWithData(serie, page);
+        res(await parseSeriePage($));
+    })
 }
 
 const parseSeriePage = ($) => {
@@ -62,7 +64,7 @@ const getCover = ($) => {
 }
 
 const getSynopsis = ($) => {
-    return $('#editdescription').children().first().text().trim();
+    return $('#editdescription').children().text().trim();
 }
 
 const getDifferName = ($) => {
@@ -228,12 +230,12 @@ const sanatizeSerieName = (title) => {
 }
 
 const getPageWithData = (title, page = 1) => {
-    console.log(`Request for ${title} and page ${page}`)
     let options = {
         uri: `http://www.novelupdates.com/series/${title}/?pg=${page}`,
         transform: function (body) {
             return cheerio.load(body);
         }
     };
-    return requestPromise(options)
-}
+    console.log(`Request for ${title} and page ${page} with url: ${options.uri}`);
+    return requestPromise(options);
+};

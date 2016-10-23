@@ -2,10 +2,11 @@ import * as Promise from 'bluebird';
 import requestPromise from 'request-promise';
 import cheerio from 'cheerio';
 
-export async function getSearchData (word = "", page = 1) {
-    let $ = await getPageWithData(word, page);
-    // return $;
-    return await searchPageParser($);
+export function getSearchData (word = "", page = 1) {
+    return new Promise(async (res, err) => {    
+        let $ = await getPageWithData(word, page);
+        res(await searchPageParser($));
+    })
 }
 
 const searchPageParser = ($) => {
@@ -15,7 +16,7 @@ const searchPageParser = ($) => {
             data = getData($)
         }
         catch(e) {
-            throw e
+            rej(e)
         }
         finally {
             res(data);
@@ -39,7 +40,7 @@ const getPageDataArray = ($) => {
             cover: el.find("img").attr("src"),
             link: el.find(".w-blog-entry-link").attr("href"),
             rating: parseFloat(el.find(".userrate").text().replace(/[^0-9.,]+/, "")),
-            genre: el.find(".s-genre").last().text().split(",").trim(),
+            genre: el.find(".s-genre").last().text().split(","),
             synopsis: sanitize(el.find(".w-blog-entry-short").text())
         }
     }).get();
@@ -50,7 +51,6 @@ const sanitize = (string) => {
 }
 
 const getMaxPage = ($) => {
-    // return 78;
     return ($('.nav-links').children(".page-numbers").last().hasClass("next")) ? 
         $('.nav-links').children(".page-numbers").last().prev().text() : $('.nav-links').children(".page-numbers").last().text();
 }
@@ -61,10 +61,11 @@ const getCurrentPage = ($) => {
 
 const getPageWithData = (word = "", page = 1) => {
     let options = {
-        uri: `http://www.novelupdates.com/page/${page}/?s=${word}&post_type=seriesplans`,
+        uri: `http://novelupdates.com/page/${page}/?s=${word}&post_type=seriesplans`,
         transform: function (body) {
             return cheerio.load(body);
         }
     };
-    return requestPromise(options)
+    console.log(`Request for ${word} and page ${page} with url: ${options.uri}`);
+    return requestPromise(options);
 }
