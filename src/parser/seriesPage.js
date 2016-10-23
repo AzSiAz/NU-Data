@@ -5,10 +5,15 @@ import moment from 'moment';
 
 export function getSerieData(serie = undefined, page = 1) {
     return new Promise(async (res, rej) => {
-        if (serie == undefined)  rej(new Error("You must specify a serie"));
-        serie = sanatizeSerieName(serie);
-        let $ = await getPageWithData(serie, page);
-        res(await parseSeriePage($));
+        try {
+            if (serie == undefined)  rej(new Error("You must specify a serie"));
+            serie = sanatizeSerieName(serie);
+            let $ = await getPageWithData(serie, page);
+            res(await parseSeriePage($));
+        }
+        catch(e) {
+            rej(e);
+        }
     })
 }
 

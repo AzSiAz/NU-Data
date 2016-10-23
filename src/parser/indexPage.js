@@ -3,13 +3,18 @@ import requestPromise from 'request-promise';
 import cheerio from 'cheerio';
 
 export function getIndexData (page = 1) {
-    return new Promise(async (res, err) => {    
-        let $ = await getPageWithData(page);
-        res(await searchPageParser($));
+    return new Promise(async (res, rej) => {
+        try {
+            let $ = await getPageWithData(page);
+            res(await indexPageParser($));
+        }
+        catch(e) {
+            rej(e)
+        }
     })
 }
 
-const searchPageParser = ($) => {
+const indexPageParser = ($) => {
     return new Promise((res, rej) => {
         let data;
         try {
