@@ -2,6 +2,7 @@ import * as Promise from 'bluebird';
 import requestPromise from 'request-promise';
 import cheerio from 'cheerio';
 
+
 export function getSearchData (word = "", page = 1) {
     return new Promise(async (res, rej) => {
         try {

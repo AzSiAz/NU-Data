@@ -1,5 +1,5 @@
 import "babel-polyfill";
-import {getSearchData, getSerieData, getIndexData, getGroupData} from './parser';
+import {getSearchData, getSerieData, getIndexData, getGroupData, getRankingData} from './parser';
 
 // (async function test() { 
 //     try {
@@ -51,16 +51,32 @@ import {getSearchData, getSerieData, getIndexData, getGroupData} from './parser'
 // })
 
 
-(async function test3() { 
+// (async function test4() { 
+//     try {
+//         let res = await getGroupData("baka-tsuki");
+//         console.log(res);
+//     }
+//     catch(e) {
+//         console.log("Error :", e);
+//     }
+// })()
+// getGroupData("AbsurdTL").then(res => {
+//     console.log(res);
+// }, err => {
+//     console.log("Error :", err);
+// })
+
+
+(async function test5() { 
     try {
-        let res = await getGroupData("baka-tsuki");
+        let res = await getRankingData();
         console.log(res);
     }
     catch(e) {
         console.log("Error :", e);
     }
 })()
-// getGroupData("baka-tsuki").then(res => {
+// getRankingData().then(res => {
 //     console.log(res);
 // }, err => {
 //     console.log("Error :", err);
