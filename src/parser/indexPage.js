@@ -2,7 +2,7 @@ import * as Promise from 'bluebird';
 import requestPromise from 'request-promise';
 import cheerio from 'cheerio';
 
-export function getIndexData (page = 3) {
+export function getIndexData (page = 1) {
     return new Promise(async (res, err) => {    
         let $ = await getPageWithData(page);
         res(await searchPageParser($));

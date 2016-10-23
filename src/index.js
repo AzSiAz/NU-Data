@@ -13,7 +13,7 @@ import {getSearchData, getSerieData, getIndexData} from './parser';
 // getSearchData("antimagic", 1).then(res => {
 //     console.log(res);
 // }, err => {
-//     console.log(err);
+//     console.log("Error :", err);
 // })
 
 
@@ -31,7 +31,7 @@ import {getSearchData, getSerieData, getIndexData} from './parser';
 // getSerieData("Absolute Duo", 2).then(res => {
 //     console.log(res);
 // }, err => {
-//     console.log(err);
+//     console.log("Error :", err);
 // })
 
 
@@ -44,8 +44,8 @@ import {getSearchData, getSerieData, getIndexData} from './parser';
         console.log("Error :", e);
     }
 })()
-getIndexData().then(res => {
-    console.log(res);
-}, err => {
-    console.log(err);
-})
+// getIndexData().then(res => {
+//     console.log(res);
+// }, err => {
+//     console.log("Error :", err);
+// })
