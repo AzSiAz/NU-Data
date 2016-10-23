@@ -64,7 +64,7 @@ const getCover = ($) => {
 }
 
 const getSynopsis = ($) => {
-    return $('#editdescription').children().first().text().trim();
+    return $('#editdescription').children().text().trim();
 }
 
 const getDifferName = ($) => {

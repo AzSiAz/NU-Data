@@ -21,6 +21,7 @@ import {getSearchData, getSerieData, getIndexData} from './parser';
 //     try {
 //         let res = await getSerieData("Absolute Duo", 2);
 //         // let res = await getSerieData("mahouka-koukou-no-rettousei-x-sword-art-online");
+//         // let res = await getSerieData("Magi’s Grandson");
 //         console.log(res);
 //     }
 //     catch(e) {
@@ -43,8 +44,8 @@ import {getSearchData, getSerieData, getIndexData} from './parser';
         console.log("Error :", e);
     }
 })()
-// getIndexData().then(res => {
-//     console.log(res);
-// }, err => {
-//     console.log(err);
-// })
+getIndexData().then(res => {
+    console.log(res);
+}, err => {
+    console.log(err);
+})
