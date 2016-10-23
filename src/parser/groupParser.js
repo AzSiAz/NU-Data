@@ -34,7 +34,7 @@ const groupPageParser = ($) => {
 
 const getData = ($) => {
     let primaryData = getBaseData($);
-    return JSON.stringify({
+    return {
         name: primaryData.title,
         link: primaryData.url,
         nbrRelease: primaryData.nbrRelease,
@@ -43,7 +43,7 @@ const getData = ($) => {
             pageMax: getReleasePageMax($) || 1,
             data: getRelease($),
         }
-    });
+    };
 }
 
 const getBaseData = ($) => {
