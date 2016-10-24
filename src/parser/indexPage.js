@@ -1,18 +1,17 @@
-import 'babel-polyfill';
 const Promise = require('bluebird');
 const requestPromise = require('request-promise');
 const cheerio = require('cheerio');
 
 
 const getIndexData = (page = 1) => {
-    return new Promise(async (res, rej) => {
-        try {
-            let $ = await getPageWithData(page);
-            res(await indexPageParser($));
-        }
-        catch (e) {
-            rej(e);
-        }
+    return new Promise((res, rej) => {
+        getPageWithData(page).then($ => {
+            return indexPageParser($);
+        }).then(resolved => {
+            res(resolved);
+        }).catch(err => {
+            rej(err);
+        });
     });
 };
 

@@ -4,14 +4,14 @@ const cheerio = require('cheerio');
 
 
 const getSearchData = (word = "", page = 1) => {
-    return new Promise(async (res, rej) => {
-        try {
-            let $ = await getPageWithData(word, page);
-            res(await searchPageParser($));
-        }
-        catch (e) {
-            rej(e);
-        }
+    return new Promise((res, rej) => {
+        getPageWithData(word, page).then( $ => {
+            return searchPageParser($);
+        }).then(resolved => {
+            res(resolved);
+        }).catch(err => {
+            rej(err);
+        });
     });
 };
 
@@ -72,7 +72,6 @@ const getPageWithData = (word = "", page = 1) => {
             return cheerio.load(body);
         }
     };
-    console.log(`Request for ${word} and page ${page} with url: ${options.uri}`);
     return requestPromise(options);
 };
 

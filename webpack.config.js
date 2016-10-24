@@ -2,9 +2,9 @@ const nodeExternals = require('webpack-node-externals');
 const path = require('path');
 
 module.exports = {
+    entry: ['./src/index.js'],
     target: 'node',
-    // externals: [nodeExternals()],
-    entry: ['babel-polyfill', './src/index.js'],
+    externals: [nodeExternals()],
     devtool: 'sourcemap',
     output: {
         path: './dist',
@@ -15,7 +15,7 @@ module.exports = {
         loaders: [{
             test: /\.js?$/,
             exclude: /node_modules/,
-            loader: 'babel' 
+            loader: 'babel-loader',
         }]
     },
 }

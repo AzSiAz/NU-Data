@@ -8,16 +8,16 @@ const moment = require('moment');
  *
  */
 const getGroupData = (group = undefined ,page = 1) => {
-    return new Promise(async (res, rej) => {
-        try {
-            if (group === undefined) {rej(new Error("You must specify a group"));}
-            group = sanatizeGroupName(group);
-            let $ = await getPageWithData(group, page);
-            res(await groupPageParser($));
-        }
-        catch (e) {
-            rej(e);
-        }
+    return new Promise((res, rej) => {
+        if (group === undefined) {rej(new Error("You must specify a group"));}
+        group = sanatizeGroupName(group);
+        getPageWithData(group, page).then($ => {
+            return groupPageParser($);
+        }).then(resolved => {
+            res(resolved);
+        }).catch(err => {
+            rej(err);
+        });
     });
 };
 
@@ -95,7 +95,6 @@ const getReleasePage = ($) => {
 
 const getReleasePageMax = ($) => {
     let last = $('.digg_pagination').children().last();
-    // return .prev().text().trim();
     if (last.hasClass('current')) {return last.text().trim();}
     else {return last.prev().text().trim();}
 };

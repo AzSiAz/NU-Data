@@ -4,15 +4,15 @@ const cheerio = require('cheerio');
 
 
 const getRankingData = (type = "popular", page = 1) => {
-    return new Promise(async (res, rej) => {
-        try {
-            type = switchType(type);
-            let $ = await getPageWithData(type, page);
-            res(await RankingPageParser($));
-        }
-        catch (e) {
-            rej(e);
-        }
+    return new Promise((res, rej) => {
+        type = switchType(type);
+        getPageWithData(type, page).then($ => {
+            return RankingPageParser($);
+        }).then(resolved => {
+        res(resolved);
+        }).catch(err => {
+            rej(err);
+        });
     });
 };
 
@@ -96,7 +96,6 @@ const getPageWithData = (type = "popular", page = 1) => {
             return cheerio.load(body);
         }
     };
-    console.log(`Request for ${type} and page ${page} with url: ${options.uri}`);
     return requestPromise(options);
 };
 

@@ -6,9 +6,9 @@ const getRankingData = require('./parser/seriesRankingParser');
 
 
 module.exports = {
-    getSearchData, 
-    getSerieData, 
-    getIndexData, 
-    getGroupData, 
-    getRankingData
+    getSearchData: getSearchData, 
+    getSerieData: getSerieData, 
+    getIndexData: getIndexData, 
+    getGroupData: getGroupData, 
+    getRankingData: getRankingData
 };

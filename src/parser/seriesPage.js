@@ -5,16 +5,17 @@ const moment = require('moment');
 
 
 const getSerieData = (serie = undefined, page = 1) => {
-    return new Promise(async (res, rej) => {
-        try {
-            if (serie === undefined) {rej(new Error("You must specify a serie"));}
-            serie = sanatizeSerieName(serie);
-            let $ = await getPageWithData(serie, page);
-            res(await parseSeriePage($));
-        }
-        catch (e) {
-            rej(e);
-        }
+    return new Promise((res, rej) => {
+        if (serie === undefined) {rej(new Error("You must specify a serie"));}
+        serie = sanatizeSerieName(serie);
+
+        getPageWithData(serie, page).then($ => {
+            return parseSeriePage($);
+        }).then(resolved => {
+            res(resolved);
+        }).catch(err => {
+            rej(err);
+        });
     });
 };
 
@@ -242,7 +243,6 @@ const getPageWithData = (title, page = 1) => {
             return cheerio.load(body);
         }
     };
-    console.log(`Request for ${title} and page ${page} with url: ${options.uri}`);
     return requestPromise(options);
 };
 
