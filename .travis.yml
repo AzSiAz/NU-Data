@@ -1,9 +1,18 @@
 language: node_js
 node_js:
-  - "5"
-  - "6"
+- '5'
+- '6'
 install:
-  - npm install -g yarn
-  - yarn install
+- npm install -g yarn
+- yarn install
 script:
-  - npm test
+- npm test
+deploy:
+  provider: npm
+  email: slider.perso@live.fr
+  api_key:
+    secure: tpwu3ReQ/C8OKy2vwIoUQhmF3J3ntuC5Xbhc7Zx+Qt19dFZqpMPssr0giHSZ2+gulH88dvDs9yJpzigoazsWhlzFCp2vVzweYRAVEpc+pWCIm112B2RMjNK9sCkXfwh6UgTqjO5et1aaG3bQmSaoraSnKkDtK3XMO6dTUOSQZUbkynzGd9rEJqj+OhjHsog0xZMHQj2/QtRctAbOCXNn4VAHhGEhgurOIT52lVb+e6E10kiTIhZSxOmW/FzFW/cypFqhhGXS7WIAxicwpf1IfOWS8hbklstZKk/gdgafLiVbtwbyR/P91N6z+AsDWQ3DKJgJkFsUKIjFd7K+Xf0Bp5c8d7oDUkbvFpPhdjVpnmADoykkUDbeeNIb73u60sk3Z23wuRTopDpDo0W3fYyRmRRrdCGtmB0ZujDPJrYEE1dd17AWG5DH1QsbZSrlILNRIlSyhHPRUIlrRh7Oq670JGOh8lEEAbQ8YXKfZW0x07WsCoJ9Fbr/+eysgq+epGiKu2ybg4UXT1tzzNL8J5RoIh/QAwZ+Ufpz9bqCKioY/3GyJFF85iWcbdUSGsrCcx/4CPBWVaYAmGNaBVTV8jJXicCWJl8t2BYUuSKkeZvEFSXrhdhODau2hYlO85rt2zGQ1DXT0zgshBGe3V6834eV9OwTUDr7a2VAd3feasSQMp0=
+  skip_cleanup: true
+  on:
+    tags: true
+    repo: AzSiAz/NU-Data
