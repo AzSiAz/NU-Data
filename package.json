@@ -4,12 +4,12 @@
   "description": "Get NovelUpdate Data",
   "main": "dist/build.js",
   "scripts": {
-    "clean": "rimraf dist docs",
-    "prebuild": "npm run lint && npm run clean",
-    "lint": "eslint src/**/*.js",
-    "pretest": "npm run build",
     "start": "webpack -w",
+    "clean": "rimraf dist docs",
+    "lint": "eslint src/**/*.js",
+    "prebuild": "npm run lint && npm run clean",
     "build": "webpack -p",
+    "pretest": "npm run build",
     "test": "ava tests/**/*.js --verbose",
     "test-w": "ava -w tests/**/*.js",
     "prepublish": "npm build && npm test"
