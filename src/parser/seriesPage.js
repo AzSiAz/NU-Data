@@ -1,22 +1,22 @@
-import * as Promise from 'bluebird';
-import requestPromise from 'request-promise';
-import cheerio from 'cheerio';
-import moment from 'moment';
+const Promise = require('bluebird');
+const requestPromise = require('request-promise');
+const cheerio = require('cheerio');
+const moment = require('moment');
 
 
-export function getSerieData(serie = undefined, page = 1) {
+const getSerieData = (serie = undefined, page = 1) => {
     return new Promise(async (res, rej) => {
         try {
-            if (serie == undefined)  rej(new Error("You must specify a serie"));
+            if (serie === undefined) {rej(new Error("You must specify a serie"));}
             serie = sanatizeSerieName(serie);
             let $ = await getPageWithData(serie, page);
             res(await parseSeriePage($));
         }
-        catch(e) {
+        catch (e) {
             rej(e);
         }
-    })
-}
+    });
+};
 
 const parseSeriePage = ($) => {
     return new Promise((res, rej) => {
@@ -24,14 +24,14 @@ const parseSeriePage = ($) => {
         try {
             data = getData($);
         }
-        catch(e) {
+        catch (e) {
             rej(e);
         }
         finally {
             res(data);
         }
-    })
-}
+    });
+};
 
 const getData = ($) => {
     return {
@@ -58,54 +58,54 @@ const getData = ($) => {
             pageMax: getReleasePageMax($) || 1,
             data: getRelease($),
         }
-    }
-}
+    };
+};
 
 const getTitle = ($) => {
     return $('.seriestitle').text().trim();
-}
+};
 
 const getCover = ($) => {
     return $('.seriesimg').children().first('img').attr('src');
-}
+};
 
 const getSynopsis = ($) => {
     return $('#editdescription').children().text().trim();
-}
+};
 
 const getDifferName = ($) => {
     let text = $('#editassociated').text();
     if (text.match(/[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\u3400-\u4dbf]/g)) {
-        return [text]
+        return [text];
     }
     return $('#editassociated').html().split("<br>").map(i => i.replace(/[\n\t\r]/g,"").trim());
-}
+};
 
 const getRelatedSerie = ($) => {
     return $('#editassociated').next('.seriesother').nextUntil('.seriesother').map((i, el) => {
         // return el = $(el).text().trim()
-        if (($(el).text().trim() != '')) {
+        if (($(el).text().trim() !== '')) {
             return {
                 title: $(el).text().trim(),
                 link: $(el).attr("href")
-            }
+            };
         }
-    }).get()
-}
+    }).get();
+};
 
 const getRecommendations = ($) => {
     return $('#editassociated').siblings('.seriesother').next('.seriesother').nextUntil('.seriesother').map((i, el) => {
-        if (($(el).text().trim() != '')) return $(el).text().trim()
-    }).get()
-}
+        if (($(el).text().trim() !== '')) {return $(el).text().trim();}
+    }).get();
+};
 
 const getType = ($) => {
     let el = $('#showtype').children().first();
     return {
         type: el.text().trim(),
         link: el.attr('href')
-    }
-}
+    };
+};
 
 const getGenres = ($) => {
     return $('#seriesgenre').children().map((i, el) => {
@@ -113,9 +113,9 @@ const getGenres = ($) => {
         return {
             genre: el.text().trim(),
             link: el.attr('href')
-        }
-    }).get()
-}
+        };
+    }).get();
+};
 
 const getTags = ($) => {
     return $('#showtags').children().map((i, el) => {
@@ -123,89 +123,89 @@ const getTags = ($) => {
         return {
             genre: el.text().trim(),
             link: el.attr('href')
-        }
-    }).get()
-}
+        };
+    }).get();
+};
 
 const getRatings = ($) => {
     return $('.uvotes').text().trim();
-}
+};
 
 const getLang = ($) => {
     return $('#showlang').children().map((i, el) => {
         el = $(el);
-        if (el.text().trim() != '') {
+        if (el.text().trim() !== '') {
             return {
                 language: el.text().trim(),
                 link: el.attr('href')
-            }
+            };
         }
-    }).get()
-}
+    }).get();
+};
 
 const getAuthors = ($) => {
     return $('#showauthors').children().map((i, el) => {
         el = $(el);
-        if (el.text().trim() != '') {
+        if (el.text().trim() !== '') {
             return {
                 name: el.text().trim(),
                 link: el.attr('href')
-            }
+            };
         }
-    }).get()
-}
+    }).get();
+};
 
 const getArtists = ($) => {
     return $('#showartists').children().map((i, el) => {
         el = $(el);
-        if (el.text().trim() != '') {
+        if (el.text().trim() !== '') {
             return {
                 name: el.text().trim(),
                 link: el.attr('href')
-            }
+            };
         }
-    }).get()
-}
+    }).get();
+};
 
 const getYear = ($) => {
     return parseInt($('#edityear').text());
-}
+};
 
 const getStatusCountryOrigin = ($) => {
     return $('#editstatus').text().replace(/[\n\t\r]/g,"").trim();
-}
+};
 
 const getLicensed = ($) => {
     return $('#showtranslated').text().trim();
-}
+};
 
 const getOriginPublisher = ($) => {
     return $('#showopublisher').children().map((i, el) => {
         el = $(el);
-        if (el.text().trim() != '') {
+        if (el.text().trim() !== '') {
             return {
                 name: el.text().trim(),
                 link: el.attr('href')
-            }
+            };
         }
-    }).get()
-}
+    }).get();
+};
 
 const getEnglishPublisher = ($) => {
     return $('#showepublisher').children().map((i, el) => {
         el = $(el);
-        if (el.text().trim() != '') {
+        if (el.text().trim() !== '') {
             return {
                 name: el.text().trim(),
                 link: el.attr('href')
-            }
+            };
         }
-    }).get()
-}
+    }).get();
+};
 
 const getRelease = ($) => {
     return $('#myTable > tbody > tr').map((i, el) => {
-        el = $(el) 
+        el = $(el);
         if (el.find('a').first().text()) {
             return {
                 date: moment.utc(el.children().first().html(), "MM/DD/YY").toDate(),
@@ -215,25 +215,25 @@ const getRelease = ($) => {
             };
         }
     }).get();
-}
+};
 
 const getReleasePage = ($) => {
     return $('.digg_pagination').find('em').text().trim();
-}
+};
 
 const getReleasePageMax = ($) => {
-    let last = $('.digg_pagination').children().last()
+    let last = $('.digg_pagination').children().last();
     // return .prev().text().trim();
-    if (last.hasClass('current')) return last.text().trim()
-    else return last.prev().text().trim();
-}
+    if (last.hasClass('current')) {return last.text().trim();}
+    else {return last.prev().text().trim();}
+};
 
 
 const sanatizeSerieName = (title) => {
     title = title.trim();
     title = title.replace(/ /g, "-");
     return title.toLowerCase();
-}
+};
 
 const getPageWithData = (title, page = 1) => {
     let options = {
@@ -245,3 +245,5 @@ const getPageWithData = (title, page = 1) => {
     console.log(`Request for ${title} and page ${page} with url: ${options.uri}`);
     return requestPromise(options);
 };
+
+module.exports = getSerieData;

@@ -1,10 +1,4 @@
 {
-  "presets": [
-  ["latest", {
-    "es2015": {
-      "modules": false 
-    }
-  }]
-],
-  "plugins": ["transform-class-properties", "external-helpers"]
+  "moduleId": "nu-data",
+  "presets": ["latest"]
 }

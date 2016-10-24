@@ -1,42 +1,42 @@
-import * as Promise from 'bluebird';
-import requestPromise from 'request-promise';
-import cheerio from 'cheerio';
+const Promise = require('bluebird');
+const requestPromise = require('request-promise');
+const cheerio = require('cheerio');
 
 
-export function getSearchData (word = "", page = 1) {
+const getSearchData = (word = "", page = 1) => {
     return new Promise(async (res, rej) => {
         try {
             let $ = await getPageWithData(word, page);
             res(await searchPageParser($));
         }
-        catch(e) {
+        catch (e) {
             rej(e);
         }
-    })
-}
+    });
+};
 
 const searchPageParser = ($) => {
     return new Promise((res, rej) => {
         let data;
         try {
-            data = getData($)
+            data = getData($);
         }
-        catch(e) {
-            rej(e)
+        catch (e) {
+            rej(e);
         }
         finally {
             res(data);
         }
-    })
-}
+    });
+};
 
 const getData = ($) => {
     return {
         page: getCurrentPage($),
         pageMax: getMaxPage($),
         data: getPageDataArray($)
-    }
-}
+    };
+};
 
 const getPageDataArray = ($) => {
     return $('div.w-blog-entry-h').map((i, el) => {
@@ -48,22 +48,22 @@ const getPageDataArray = ($) => {
             rating: parseFloat(el.find(".userrate").text().replace(/[^0-9.,]+/, "")),
             genre: el.find(".s-genre").last().text().split(","),
             synopsis: sanitize(el.find(".w-blog-entry-short").text())
-        }
+        };
     }).get();
-}
+};
 
 const sanitize = (string) => {
     return string.replace(/[\n\t\r]/g,"").trim();
-}
+};
 
 const getMaxPage = ($) => {
-    return ($('.nav-links').children(".page-numbers").last().hasClass("next")) ? 
+    return ($('.nav-links').children(".page-numbers").last().hasClass("next")) ?
         $('.nav-links').children(".page-numbers").last().prev().text() : $('.nav-links').children(".page-numbers").last().text();
-}
+};
 
 const getCurrentPage = ($) => {
     return $('.page-numbers.current').text();
-}
+};
 
 const getPageWithData = (word = "", page = 1) => {
     let options = {
@@ -74,4 +74,6 @@ const getPageWithData = (word = "", page = 1) => {
     };
     console.log(`Request for ${word} and page ${page} with url: ${options.uri}`);
     return requestPromise(options);
-}
+};
+
+module.exports = getSearchData;

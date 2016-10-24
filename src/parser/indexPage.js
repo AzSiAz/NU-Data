@@ -1,34 +1,35 @@
-import * as Promise from 'bluebird';
-import requestPromise from 'request-promise';
-import cheerio from 'cheerio';
+import 'babel-polyfill';
+const Promise = require('bluebird');
+const requestPromise = require('request-promise');
+const cheerio = require('cheerio');
 
 
-export function getIndexData (page = 1) {
+const getIndexData = (page = 1) => {
     return new Promise(async (res, rej) => {
         try {
             let $ = await getPageWithData(page);
             res(await indexPageParser($));
         }
-        catch(e) {
-            rej(e)
+        catch (e) {
+            rej(e);
         }
-    })
-}
+    });
+};
 
 const indexPageParser = ($) => {
     return new Promise((res, rej) => {
         let data;
         try {
-            data = getData($)
+            data = getData($);
         }
-        catch(e) {
-            throw e
+        catch (e) {
+            throw e;
         }
         finally {
             res(data);
         }
-    })
-}
+    });
+};
 
 const getData = ($) => {
     return {
@@ -39,18 +40,18 @@ const getData = ($) => {
             latest_translation: getRelease($)
         }
     };
-}
+};
 
 const getReleasePage = ($) => {
     return $('.digg_pagination').find('em').text().trim();
-}
+};
 
 const getReleasePageMax = ($) => {
-    let last = $('.digg_pagination').children().last()
+    let last = $('.digg_pagination').children().last();
     // return .prev().text().trim();
-    if (last.hasClass('current')) return last.text().trim()
-    else return last.prev().text().trim();
-}
+    if (last.hasClass('current')) {return last.text().trim();}
+    else {return last.prev().text().trim();}
+};
 
 
 const getRelease = ($) => {
@@ -58,8 +59,8 @@ const getRelease = ($) => {
         el = $(el);
         return {
             title: el.prev().text(),
-            data: el.find('tr').map((i, el2) => {
-                el2 = $(el2) 
+            data: el.find('tr').map((i2, el2) => {
+                el2 = $(el2);
                 if (el2.find('a').first().text()) {
                     return {
                         title: {
@@ -77,9 +78,9 @@ const getRelease = ($) => {
                     };
                 }
             }).get()
-        }
+        };
     }).get();
-}
+};
 
 const getPageWithData = (page = 1) => {
     let options = {
@@ -88,5 +89,7 @@ const getPageWithData = (page = 1) => {
             return cheerio.load(body);
         }
     };
-    return requestPromise(options)
-}
+    return requestPromise(options);
+};
+
+module.exports = getIndexData;
