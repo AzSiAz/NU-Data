@@ -168,7 +168,7 @@ const getArtists = ($) => {
 };
 
 const getYear = ($) => {
-    return parseInt($('#edityear').text());
+    return parseInt($('#edityear').text(), 10);
 };
 
 const getStatusCountryOrigin = ($) => {
