@@ -1,5 +1,5 @@
 const Promise = require('bluebird');
-const requestPromise = require('request-promise');
+const fetch = require('isomorphic-fetch');
 const cheerio = require('cheerio');
 
 
@@ -90,13 +90,17 @@ const getCurrentPage = ($) => {
 };
 
 const getPageWithData = (type = "popular", page = 1) => {
-    let options = {
-        uri: `http://www.novelupdates.com/series-ranking/?rank=${type}&pg=${page}`,
-        transform: function (body) {
-            return cheerio.load(body);
-        }
-    };
-    return requestPromise(options);
+    return new Promise((res, rej) => {
+        fetch(`http://www.novelupdates.com/series-ranking/?rank=${type}&pg=${page}`).then(function(response) {
+            if (response.status >= 400) {
+                rej(Error("Bad response from server"));
+            }
+            return response.text();
+        })
+        .then(function(body) {
+            res(cheerio.load(body));
+        });
+    });
 };
 
 module.exports = getRankingData;

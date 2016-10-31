@@ -1,5 +1,5 @@
 const Promise = require('bluebird');
-const requestPromise = require('request-promise');
+const fetch = require('isomorphic-fetch');
 const cheerio = require('cheerio');
 const moment = require('moment');
 
@@ -106,13 +106,17 @@ const sanatizeGroupName = (title) => {
 };
 
 const getPageWithData = (group, page = 1) => {
-    let options = {
-        uri: `http://www.novelupdates.com/group/${group}/?pg=${page}`,
-        transform: function (body) {
-            return cheerio.load(body);
-        }
-    };
-    return requestPromise(options);
+    return new Promise((res, rej) => {
+        fetch(`http://www.novelupdates.com/group/${group}/?pg=${page}`).then(function(response) {
+            if (response.status >= 400) {
+                rej(Error("Bad response from server"));
+            }
+            return response.text();
+        })
+        .then(function(body) {
+            res(cheerio.load(body));
+        });
+    });
 };
 
 module.exports = getGroupData;

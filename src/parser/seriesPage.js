@@ -1,5 +1,5 @@
 const Promise = require('bluebird');
-const requestPromise = require('request-promise');
+const fetch = require('isomorphic-fetch');
 const cheerio = require('cheerio');
 const moment = require('moment');
 
@@ -84,7 +84,6 @@ const getDifferName = ($) => {
 
 const getRelatedSerie = ($) => {
     return $('#editassociated').next('.seriesother').nextUntil('.seriesother').map((i, el) => {
-        // return el = $(el).text().trim()
         if (($(el).text().trim() !== '')) {
             return {
                 title: $(el).text().trim(),
@@ -224,7 +223,6 @@ const getReleasePage = ($) => {
 
 const getReleasePageMax = ($) => {
     let last = $('.digg_pagination').children().last();
-    // return .prev().text().trim();
     if (last.hasClass('current')) {return last.text().trim();}
     else {return last.prev().text().trim();}
 };
@@ -237,13 +235,17 @@ const sanatizeSerieName = (title) => {
 };
 
 const getPageWithData = (title, page = 1) => {
-    let options = {
-        uri: `http://www.novelupdates.com/series/${title}/?pg=${page}`,
-        transform: function (body) {
-            return cheerio.load(body);
-        }
-    };
-    return requestPromise(options);
+    return new Promise((res, rej) => {
+        fetch(`http://www.novelupdates.com/series/${title}/?pg=${page}`).then(function(response) {
+            if (response.status >= 400) {
+                rej(Error("Bad response from server"));
+            }
+            return response.text();
+        })
+        .then(function(body) {
+            res(cheerio.load(body));
+        });
+    });
 };
 
 module.exports = getSerieData;

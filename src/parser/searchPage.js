@@ -1,5 +1,5 @@
 const Promise = require('bluebird');
-const requestPromise = require('request-promise');
+const fetch = require('isomorphic-fetch');
 const cheerio = require('cheerio');
 
 
@@ -66,13 +66,17 @@ const getCurrentPage = ($) => {
 };
 
 const getPageWithData = (word = "", page = 1) => {
-    let options = {
-        uri: `http://novelupdates.com/page/${page}/?s=${word}&post_type=seriesplans`,
-        transform: function (body) {
-            return cheerio.load(body);
-        }
-    };
-    return requestPromise(options);
+    return new Promise((res, rej) => {
+        fetch(`http://novelupdates.com/page/${page}/?s=${word}&post_type=seriesplans`).then(function(response) {
+            if (response.status >= 400) {
+                rej(Error("Bad response from server"));
+            }
+            return response.text();
+        })
+        .then(function(body) {
+            res(cheerio.load(body));
+        });
+    });
 };
 
 module.exports = getSearchData;
