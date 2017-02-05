@@ -30,7 +30,7 @@
   },
   "homepage": "https://github.com/AzSiAz/NU-Data#readme",
   "devDependencies": {
-    "ava": "^0.16.0",
+    "ava": "^0.18.1",
     "babel-core": "^6.17.0",
     "babel-eslint": "^7.0.0",
     "babel-loader": "^6.2.5",
@@ -41,7 +41,7 @@
     "documentation": "4.0.0-beta10",
     "eslint": "^3.6.1",
     "rimraf": "^2.5.4",
-    "webpack": "^1.13.2",
+    "webpack": "^2.2.1",
     "webpack-node-externals": "^1.5.4"
   },
   "dependencies": {
