@@ -60,7 +60,7 @@ const ParseTableData = ($) => {
             lang: el.find('td.orgalign').text(),
             genre: getGenre($, el),
             synpsis: getSynopsis($, el),
-            nbrRelease: el.children().last().find('.sfstext').last().html().split('</b>')[1].trim()
+            nbrRelease: el.children().last().find('.sfstext').last().html().split('</b>')[1]
         };
     }).get();
 };

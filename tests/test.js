@@ -1,52 +1,53 @@
-import test from 'ava';
-const {getSearchData, getSerieData, getIndexData, getGroupData, getRankingData} = require('../dist/build');
+import { 
+    getSearchData,
+    getSerieData,
+    getIndexData,
+    getGroupData,
+    getRankingData
+} from '../src/index'
 
-test('getSearchData', async t => {
-    try {
-        let res = await getSearchData("antimagic", 1);
-        t.is(res.page, "1");
-    }
-    catch(e) {
-        t.fail("Error : " + e);
-    }
+
+describe('getSearchData', () => {
+
+    it('Should return data for antimagic search', async () => {
+        let res = await getSearchData('antimagic', 1)
+        expect(res.page).toBe('1')
+    })
+
+})
+
+describe('getSerieData', () => {
+    
+    it('Title should be Absolute Duo', async () => {
+        let res = await getSerieData('Absolute Duo')
+        expect(res.Title, 'Absolute Duo')
+    })
+
+})
+
+describe('getIndexData', () => {
+
+    it('Should return index page data', async () => {
+        let res = await getIndexData()
+        expect(res.page).toBe('1')
+    })
+
+})
+
+describe('getGroupData', async () => {
+
+    it('Should get data from translation group page', async () => {
+        let res = await getGroupData('AbsurdTL')
+        expect(res.name).toBe('AbsurdTL')
+    })
+
 });
 
-test('getSerieData', async t => {
-    try {
-        let res = await getSerieData("Absolute Duo", 1);
-        t.is(res.Title, "Absolute Duo");
-    }
-    catch(e) {
-        t.fail("Error : " + e);
-    }
-});
+describe('getRankingData', async () => {
 
-test('getIndexData', async t => {
-    try {
-        let res = await getIndexData();
-        t.is(res.page, "1");
-    }
-    catch(e) {
-        t.fail("Error : " + e);
-    }
-});
+    it('Should get ranking for antimagic novel', async () => {
+        let res = await getRankingData('antimagic', 1)
+        expect(res.page).toBe('1')
+    })
 
-test('getGroupData', async t => {
-    try {
-        let res = await getGroupData("AbsurdTL");
-        t.is(res.name, "AbsurdTL");
-    }
-    catch(e) {
-        t.fail("Error : " + e);
-    }
-});
-
-test('getRankingData', async t => {
-    try {
-        let res = await getRankingData("antimagic", 1);
-        t.is(res.page, "1");
-    }
-    catch(e) {
-        t.fail("Error : " + e);
-    }
 });
