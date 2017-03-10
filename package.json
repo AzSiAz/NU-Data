@@ -11,7 +11,7 @@
     "test": "jest --coverage",
     "test-w": "jest --watch",
     "lint": "esw -w src test",
-    "prepublish": "npm build && npm test"
+    "prepublish": "npm run build"
   },
   "repository": {
     "type": "git",
