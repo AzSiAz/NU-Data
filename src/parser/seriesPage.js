@@ -63,7 +63,7 @@ const getData = ($) => {
 };
 
 const getTitle = ($) => {
-    return $('.seriestitle').text().trim();
+    return $('.seriestitlenu').text().trim();
 };
 
 const getCover = ($) => {
