@@ -78,7 +78,7 @@ const getCurrentPage = ($) => {
 
 const getPageWithData = async (type = 'popular', page = 1) => {
     try {
-        let response = await fetch(`http://www.novelupdates.com/series-ranking/?rank=${type}&pg=${page}`)
+        let response = await fetch(`https://www.novelupdates.com/series-ranking/?rank=${type}&pg=${page}`)
         if (response.status >= 400) {
             return Promise.reject(new Error('Bad response from server'))
         }
@@ -86,7 +86,7 @@ const getPageWithData = async (type = 'popular', page = 1) => {
         return cheerio.load(body)
     }
     catch(err) {
-        return Promise.reject(new Error(`Can't download html for http://www.novelupdates.com/series-ranking/?rank=${type}&pg=${page}`))
+        return Promise.reject(new Error(`Can't download html for https://www.novelupdates.com/series-ranking/?rank=${type}&pg=${page}`))
     }
 
 };

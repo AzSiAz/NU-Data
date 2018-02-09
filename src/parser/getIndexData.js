@@ -83,7 +83,7 @@ const getRelease = ($) => {
 
 const getPageWithData = (page = 1) => {
     return new Promise((res, rej) => {
-        fetch(`http://www.novelupdates.com/?pg=${page}`).then(function(response) {
+        fetch(`https://www.novelupdates.com/?pg=${page}`).then(function(response) {
             if (response.status >= 400) {
                 rej(Error("Bad response from server"));
             }

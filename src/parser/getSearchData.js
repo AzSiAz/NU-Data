@@ -67,7 +67,7 @@ const getCurrentPage = ($) => {
 
 const getPageWithData = (word = "", page = 1) => {
     return new Promise((res, rej) => {
-        fetch(`http://novelupdates.com/page/${page}/?s=${word}&post_type=seriesplans`).then(function(response) {
+        fetch(`https://novelupdates.com/page/${page}/?s=${word}&post_type=seriesplans`).then(function(response) {
             if (response.status >= 400) {
                 rej(Error("Bad response from server"));
             }

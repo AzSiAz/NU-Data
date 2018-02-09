@@ -107,7 +107,7 @@ const sanatizeGroupName = (title) => {
 
 const getPageWithData = (group, page = 1) => {
     return new Promise((res, rej) => {
-        fetch(`http://www.novelupdates.com/group/${group}/?pg=${page}`).then(function(response) {
+        fetch(`https://www.novelupdates.com/group/${group}/?pg=${page}`).then(function(response) {
             if (response.status >= 400) {
                 rej(Error("Bad response from server"));
             }
