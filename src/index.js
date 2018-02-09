@@ -1,7 +1,7 @@
 module.exports = {
-    getSearchData: require('./parser/searchPage'), 
-    getSerieData: require('./parser/seriesPage'), 
-    getIndexData: require('./parser/indexPage'), 
-    getGroupData: require('./parser/groupParser'), 
-    getRankingData: require('./parser/seriesRankingParser')
+    getSearchData: require('./parser/getSearchData'), 
+    getSerieData: require('./parser/getSerieData'), 
+    getIndexData: require('./parser/getIndexData'), 
+    getGroupData: require('./parser/getGroupData'), 
+    getRankingData: require('./parser/getRankingData')
 };

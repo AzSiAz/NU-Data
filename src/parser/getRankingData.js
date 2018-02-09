@@ -3,46 +3,33 @@ const fetch = require('isomorphic-fetch');
 const cheerio = require('cheerio');
 
 
-const getRankingData = (type = "popular", page = 1) => {
-    return new Promise((res, rej) => {
-        type = switchType(type);
-        getPageWithData(type, page).then($ => {
-            return RankingPageParser($);
-        }).then(resolved => {
-        res(resolved);
-        }).catch(err => {
-            rej(err);
-        });
-    });
+const getRankingData = async (type = 'popular', page = 1) => {
+    type = switchType(type);
+    let $ = await getPageWithData(type, page).catch(err => { return Promise.reject(err) })
+    return RankingPageParser($);
 };
 
 const switchType = (type) => {
     switch (type) {
-        case "popular":
-            return type;
-        case "popmonth":
+        case 'popular':
+        case 'popmonth':
             return type;
         default:
-            return "popular";
+            return 'popular';
     }
 };
 
-const RankingPageParser = ($) => {
-    return new Promise((res, rej) => {
-        let data;
-        try {
-            data = getData($);
-        }
-        catch (e) {
-            rej(e);
-        }
-        finally {
-            res(data);
-        }
-    });
+const RankingPageParser = async ($) => {
+    try {
+        let data = await getData($);
+        return data
+    }
+    catch (e) {
+        return Promise.reject(e);
+    }
 };
 
-const getData = ($) => {
+const getData = async ($) => {
     return {
         page: getCurrentPage($),
         pageMax: getMaxPage($),
@@ -70,7 +57,7 @@ const getSynopsis = ($, el) => {
     let text2 = text.split('... more>>');
     let text3 = text2[1].split('<<less');
     text = text2[0] + text3[0];
-    return text.replace(/[\n\t\r]/g," ").trim();
+    return text.replace(/[\n\t\r]/g,' ').trim();
 };
 
 const getGenre = ($, el) => {
@@ -81,7 +68,7 @@ const getGenre = ($, el) => {
 };
 
 const getMaxPage = ($) => {
-    return ($('div.digg_pagination').children().last().hasClass("next_page")) ?
+    return ($('div.digg_pagination').children().last().hasClass('next_page')) ?
         $('div.digg_pagination').children().last().prev().text() : $('div.digg_pagination').children().last().text();
 };
 
@@ -89,18 +76,19 @@ const getCurrentPage = ($) => {
     return $('em.current').text();
 };
 
-const getPageWithData = (type = "popular", page = 1) => {
-    return new Promise((res, rej) => {
-        fetch(`http://www.novelupdates.com/series-ranking/?rank=${type}&pg=${page}`).then(function(response) {
-            if (response.status >= 400) {
-                rej(Error("Bad response from server"));
-            }
-            return response.text();
-        })
-        .then(function(body) {
-            res(cheerio.load(body));
-        });
-    });
+const getPageWithData = async (type = 'popular', page = 1) => {
+    try {
+        let response = await fetch(`http://www.novelupdates.com/series-ranking/?rank=${type}&pg=${page}`)
+        if (response.status >= 400) {
+            return Promise.reject(new Error('Bad response from server'))
+        }
+        let body = await response.text()
+        return cheerio.load(body)
+    }
+    catch(err) {
+        return Promise.reject(new Error(`Can't download html for http://www.novelupdates.com/series-ranking/?rank=${type}&pg=${page}`))
+    }
+
 };
 
 module.exports = getRankingData;
