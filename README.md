@@ -1,5 +1,5 @@
 # NU-Data
-[![Build Status](https://travis-ci.org/AzSiAz/NU-Data.svg?branch=master)](https://travis-ci.org/AzSiAz/NU-Data)
+[![Build Status](https://drone.azs.moe/api/badges/AzSiAz/NU-Data/status.svg)](https://drone.azs.moe/AzSiAz/NU-Data)
 
 # Description
 
