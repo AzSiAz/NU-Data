@@ -1,11 +1,10 @@
-const Promise = require('bluebird');
 const fetch = require('isomorphic-fetch');
 const cheerio = require('cheerio');
 
 
 const getSearchData = (word = "", page = 1) => {
     return new Promise((res, rej) => {
-        getPageWithData(word, page).then( $ => {
+        getPageWithData(word, page).then($ => {
             return searchPageParser($);
         }).then(resolved => {
             res(resolved);
@@ -53,7 +52,7 @@ const getPageDataArray = ($) => {
 };
 
 const sanitize = (string) => {
-    return string.replace(/[\n\t\r]/g,"").trim();
+    return string.replace(/[\n\t\r]/g, "").trim();
 };
 
 const getMaxPage = ($) => {
@@ -67,15 +66,15 @@ const getCurrentPage = ($) => {
 
 const getPageWithData = (word = "", page = 1) => {
     return new Promise((res, rej) => {
-        fetch(`https://novelupdates.com/page/${page}/?s=${word}&post_type=seriesplans`).then(function(response) {
+        fetch(`https://novelupdates.com/page/${page}/?s=${word}&post_type=seriesplans`).then(function (response) {
             if (response.status >= 400) {
                 rej(Error("Bad response from server"));
             }
             return response.text();
         })
-        .then(function(body) {
-            res(cheerio.load(body));
-        });
+            .then(function (body) {
+                res(cheerio.load(body));
+            });
     });
 };
 

@@ -1,4 +1,3 @@
-const Promise = require('bluebird');
 const fetch = require('isomorphic-fetch');
 const cheerio = require('cheerio');
 const moment = require('moment');
@@ -6,7 +5,7 @@ const moment = require('moment');
 
 const getSerieData = (serie = undefined, page = 1) => {
     return new Promise((res, rej) => {
-        if (serie === undefined) {rej(new Error("You must specify a serie"));}
+        if (serie === undefined) { rej(new Error("You must specify a serie")); }
         serie = sanatizeSerieName(serie);
 
         getPageWithData(serie, page).then($ => {
@@ -43,7 +42,7 @@ const getData = ($) => {
         Related: getRelatedSerie($),
         Recommendations: getRecommendations($),
         Type: getType($),
-        Genres : getGenres($),
+        Genres: getGenres($),
         Tags: getTags($),
         Ratings: getRatings($),
         Languages: getLang($),
@@ -79,7 +78,7 @@ const getDifferName = ($) => {
     if (text.match(/[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\u3400-\u4dbf]/g)) {
         return [text];
     }
-    return $('#editassociated').html().split("<br>").map(i => i.replace(/[\n\t\r]/g,"").trim());
+    return $('#editassociated').html().split("<br>").map(i => i.replace(/[\n\t\r]/g, "").trim());
 };
 
 const getRelatedSerie = ($) => {
@@ -95,7 +94,7 @@ const getRelatedSerie = ($) => {
 
 const getRecommendations = ($) => {
     return $('#editassociated').siblings('.seriesother').next('.seriesother').nextUntil('.seriesother').map((i, el) => {
-        if (($(el).text().trim() !== '')) {return $(el).text().trim();}
+        if (($(el).text().trim() !== '')) { return $(el).text().trim(); }
     }).get();
 };
 
@@ -172,7 +171,7 @@ const getYear = ($) => {
 };
 
 const getStatusCountryOrigin = ($) => {
-    return $('#editstatus').text().replace(/[\n\t\r]/g,"").trim();
+    return $('#editstatus').text().replace(/[\n\t\r]/g, "").trim();
 };
 
 const getLicensed = ($) => {
@@ -223,8 +222,8 @@ const getReleasePage = ($) => {
 
 const getReleasePageMax = ($) => {
     let last = $('.digg_pagination').children().last();
-    if (last.hasClass('current')) {return last.text().trim();}
-    else {return last.prev().text().trim();}
+    if (last.hasClass('current')) { return last.text().trim(); }
+    else { return last.prev().text().trim(); }
 };
 
 
@@ -236,15 +235,15 @@ const sanatizeSerieName = (title) => {
 
 const getPageWithData = (title, page = 1) => {
     return new Promise((res, rej) => {
-        fetch(`https://www.novelupdates.com/series/${title}/?pg=${page}`).then(function(response) {
+        fetch(`https://www.novelupdates.com/series/${title}/?pg=${page}`).then(function (response) {
             if (response.status >= 400) {
                 rej(Error("Bad response from server"));
             }
             return response.text();
         })
-        .then(function(body) {
-            res(cheerio.load(body));
-        });
+            .then(function (body) {
+                res(cheerio.load(body));
+            });
     });
 };
 

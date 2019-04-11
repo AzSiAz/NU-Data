@@ -1,4 +1,3 @@
-const Promise = require('bluebird');
 const fetch = require('isomorphic-fetch');
 const cheerio = require('cheerio');
 
@@ -48,8 +47,8 @@ const getReleasePage = ($) => {
 const getReleasePageMax = ($) => {
     let last = $('.digg_pagination').children().last();
     // return .prev().text().trim();
-    if (last.hasClass('current')) {return last.text().trim();}
-    else {return last.prev().text().trim();}
+    if (last.hasClass('current')) { return last.text().trim(); }
+    else { return last.prev().text().trim(); }
 };
 
 
@@ -83,15 +82,15 @@ const getRelease = ($) => {
 
 const getPageWithData = (page = 1) => {
     return new Promise((res, rej) => {
-        fetch(`https://www.novelupdates.com/?pg=${page}`).then(function(response) {
+        fetch(`https://www.novelupdates.com/?pg=${page}`).then(function (response) {
             if (response.status >= 400) {
                 rej(Error("Bad response from server"));
             }
             return response.text();
         })
-        .then(function(body) {
-            res(cheerio.load(body));
-        });
+            .then(function (body) {
+                res(cheerio.load(body));
+            });
     });
 };
 

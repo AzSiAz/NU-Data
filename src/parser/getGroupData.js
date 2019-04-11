@@ -1,4 +1,3 @@
-const Promise = require('bluebird');
 const fetch = require('isomorphic-fetch');
 const cheerio = require('cheerio');
 const moment = require('moment');
@@ -7,9 +6,9 @@ const moment = require('moment');
  *
  *
  */
-const getGroupData = (group = undefined ,page = 1) => {
+const getGroupData = (group = undefined, page = 1) => {
     return new Promise((res, rej) => {
-        if (group === undefined) {rej(new Error("You must specify a group"));}
+        if (group === undefined) { rej(new Error("You must specify a group")); }
         group = sanatizeGroupName(group);
         getPageWithData(group, page).then($ => {
             return groupPageParser($);
@@ -95,8 +94,8 @@ const getReleasePage = ($) => {
 
 const getReleasePageMax = ($) => {
     let last = $('.digg_pagination').children().last();
-    if (last.hasClass('current')) {return last.text().trim();}
-    else {return last.prev().text().trim();}
+    if (last.hasClass('current')) { return last.text().trim(); }
+    else { return last.prev().text().trim(); }
 };
 
 const sanatizeGroupName = (title) => {
@@ -107,15 +106,15 @@ const sanatizeGroupName = (title) => {
 
 const getPageWithData = (group, page = 1) => {
     return new Promise((res, rej) => {
-        fetch(`https://www.novelupdates.com/group/${group}/?pg=${page}`).then(function(response) {
+        fetch(`https://www.novelupdates.com/group/${group}/?pg=${page}`).then(function (response) {
             if (response.status >= 400) {
                 rej(Error("Bad response from server"));
             }
             return response.text();
         })
-        .then(function(body) {
-            res(cheerio.load(body));
-        });
+            .then(function (body) {
+                res(cheerio.load(body));
+            });
     });
 };
 

@@ -1,4 +1,3 @@
-const Promise = require('bluebird');
 const fetch = require('isomorphic-fetch');
 const cheerio = require('cheerio');
 
@@ -57,7 +56,7 @@ const getSynopsis = ($, el) => {
     let text2 = text.split('... more>>');
     let text3 = text2[1].split('<<less');
     text = text2[0] + text3[0];
-    return text.replace(/[\n\t\r]/g,' ').trim();
+    return text.replace(/[\n\t\r]/g, ' ').trim();
 };
 
 const getGenre = ($, el) => {
@@ -85,7 +84,7 @@ const getPageWithData = async (type = 'popular', page = 1) => {
         let body = await response.text()
         return cheerio.load(body)
     }
-    catch(err) {
+    catch (err) {
         return Promise.reject(new Error(`Can't download html for https://www.novelupdates.com/series-ranking/?rank=${type}&pg=${page}`))
     }
 
