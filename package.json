@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest --coverage",
     "test-w": "jest --watch --coverage",
-    "lint": "esw -w src test"
+    "lint": "esw src test"
   },
   "repository": {
     "type": "git",
