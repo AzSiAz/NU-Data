@@ -6,7 +6,6 @@ steps:
   image: node
   commands:
   - npm install
-  - npm run lint
   - npm test
 
 - name: coveralls
