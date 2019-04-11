@@ -2,8 +2,33 @@ kind: pipeline
 name: default
 
 steps:
-- name: testing drone with node
+- name: test
   image: node
   commands:
   - npm install
+  - npm run lint
   - npm test
+
+- name: coveralls
+  image: lizheming/drone-coveralls
+  environment:
+    COVERALLS_REPO_TOKEN:
+      from_secret: coveralls_token
+  settings:
+    files:
+    - ./coverage/lcov.info
+
+- name: Publish to NPM
+  image: plugins/npm
+  settings:
+    username:
+      from_secret: npm_username
+    password:
+      from_secret: npm_password
+    email:
+      from_secret: npm_email
+  when:
+    status:
+    - success
+    event:
+    - tag

@@ -2,16 +2,11 @@
   "name": "nu-data",
   "version": "1.2.5",
   "description": "Get NovelUpdate Data",
-  "main": "dist/index.js",
+  "main": "src/index.js",
   "scripts": {
-    "start": "npm run -s -w build",
-    "dev": "nodemon src/index.js --exec \"node -r dotenv/config -r babel-register\"",
-    "clean": "rimraf dist",
-    "build": "npm run clean && mkdir -p dist && babel src -s -D -d dist",
     "test": "jest --coverage",
     "test-w": "jest --watch --coverage",
-    "lint": "esw -w src test",
-    "prepublish": "npm run build"
+    "lint": "esw -w src test"
   },
   "repository": {
     "type": "git",
@@ -29,38 +24,19 @@
   },
   "homepage": "https://github.com/AzSiAz/NU-Data#readme",
   "devDependencies": {
-    "babel-cli": "^6.23.0",
-    "babel-jest": "^19.0.0",
-    "babel-preset-env": "^1.2.1",
-    "babel-register": "^6.23.0",
-    "coveralls": "^2.12.0",
-    "dotenv": "^4.0.0",
-    "eslint": "^3.17.1",
-    "eslint-plugin-import": "^2.2.0",
-    "eslint-plugin-jest": "^19.0.1",
-    "eslint-watch": "^3.0.1",
-    "jest": "^19.0.2",
-    "nodemon": "^1.11.0",
-    "supertest": "^3.0.0",
-    "rimraf": "^2.6.1"
+    "@types/jest": "^24.0.11",
+    "coveralls": "^3.0.3",
+    "eslint": "^5.16.0",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-jest": "^22.4.1",
+    "eslint-watch": "^5.0.1",
+    "jest": "^24.7.1",
+    "supertest": "^4.0.2"
   },
   "dependencies": {
-    "bluebird": "^3.4.6",
     "cheerio": "^0.22.0",
     "isomorphic-fetch": "^2.2.1",
-    "moment": "^2.15.1"
-  },
-  "babel": {
-    "presets": [
-      [
-        "env",
-        {
-          "targets": {
-            "node": "current"
-          }
-        }
-      ]
-    ]
+    "moment": "^2.24.0"
   },
   "eslintConfig": {
     "plugins": [

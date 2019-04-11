@@ -1,13 +1,11 @@
-import { 
-    getIndexData
-} from '../src/index'
+const { getIndexData } = require('../src/index')
 
 
 describe('getIndexData', () => {
 
-    it('Should return index page data', async () => {
+    test('Should return index page data', async () => {
         let res = await getIndexData()
         expect(res.page).toBe('1')
-    })
+    }, 1000000)
 
 })

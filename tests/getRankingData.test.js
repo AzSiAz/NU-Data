@@ -1,15 +1,13 @@
-import { 
-    getRankingData
-} from '../src/index'
+const { getRankingData } = require('./../src/index')
 
 
-describe('getRankingData', async () => {
+describe('getRankingData', () => {
 
-    it('Should get ranking for antimagic novel', async () => {
+    test('Should get ranking for antimagic novel', async () => {
         let res = await getRankingData('antimagic', 1)
         expect(res.page).toBe('1')
         res = await getRankingData('popular', 1)
         expect(res.page).toBe('1')
-    })
+    }, 1000000)
 
 })

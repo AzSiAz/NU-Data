@@ -1,13 +1,11 @@
-import { 
-    getGroupData
-} from '../src/index'
+const { getGroupData } = require('../src/index')
 
 
-describe('getGroupData', async () => {
+describe('getGroupData', () => {
 
-    it('Should get data from translation group page', async () => {
+    test('Should get data from translation group page', async () => {
         let res = await getGroupData('AbsurdTL')
         expect(res.name).toBe('AbsurdTL')
-    })
+    }, 1000000)
 
 })
