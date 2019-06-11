@@ -3,40 +3,6 @@ const fetch = require("isomorphic-fetch");
 const { getPagination } = require("../helpers");
 
 /**
- * Parses novelslisting https://www.novelupdates.com/novelslisting
- *
- * TODO: filter/sort?
- * @param {number} page - novels listing page number
- */
-const getSeriesList = (page = 1) => getPageWithData(page).then(parsePage);
-
-/**
- * @param {number} page
- * @returns {CheerioStatic}
- */
-const getPageWithData = async page => {
-    const res = await fetch(
-        `https://www.novelupdates.com/novelslisting/?st=1&pg=${page}`
-    );
-
-    if (res.status >= 400) {
-        throw new Error(res.statusText);
-    }
-
-    return cheerio.load(await res.text());
-};
-
-/**
- * @param {CheerioStatic} $
- */
-const parsePage = $ => ({
-    ...getPagination($),
-    data: $(".bdrank")
-        .map(parseRow)
-        .toArray()
-});
-
-/**
  * @param {number} i - index
  * @param {CheerioElement} el - cheerio .bdrank element
  */
@@ -72,5 +38,39 @@ const parseRow = (_, el) => {
         genres
     };
 };
+
+/**
+ * @param {CheerioStatic} $
+ */
+const parsePage = ($) => ({
+    ...getPagination($),
+    data: $(".bdrank")
+        .map(parseRow)
+        .toArray()
+});
+
+/**
+ * @param {number} page
+ * @returns {CheerioStatic}
+ */
+const getPageWithData = async (page) => {
+    const res = await fetch(
+        `https://www.novelupdates.com/novelslisting/?st=1&pg=${page}`
+    );
+
+    if (res.status >= 400) {
+        throw new Error(res.statusText);
+    }
+
+    return cheerio.load(await res.text());
+};
+
+/**
+ * Parses novelslisting https://www.novelupdates.com/novelslisting
+ *
+ * TODO: filter/sort?
+ * @param {number} page - novels listing page number
+ */
+const getSeriesList = (page = 1) => getPageWithData(page).then(parsePage);
 
 module.exports = getSeriesList;

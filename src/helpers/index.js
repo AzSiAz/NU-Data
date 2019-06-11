@@ -1,4 +1,4 @@
-const getPagination = $ => {
+const getPagination = ($) => {
     const last = $("div.digg_pagination")
         .children()
         .last();

@@ -7,7 +7,7 @@ describe("getSeriesList", () => {
         expect(res.data).toHaveLength(25);
     }, 1e5);
 
-    test("should throw", async () => {
+    test("should return an empty list", async () => {
         const res = await getSeriesList(3000);
         expect(res.data).toHaveLength(0);
     }, 1e5);
