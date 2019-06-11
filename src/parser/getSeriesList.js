@@ -5,6 +5,7 @@ const { getPagination } = require("../helpers");
 /**
  * Parses novelslisting https://www.novelupdates.com/novelslisting
  *
+ * TODO: filter/sort?
  * @param {number} page - novels listing page number
  */
 const getSeriesList = (page = 1) => getPageWithData(page).then(parsePage);
@@ -16,9 +17,13 @@ const getSeriesList = (page = 1) => getPageWithData(page).then(parsePage);
 const getPageWithData = async page => {
     const res = await fetch(
         `https://www.novelupdates.com/novelslisting/?st=1&pg=${page}`
-    ).then(res => res.text());
+    );
 
-    return cheerio.load(res);
+    if (res.status >= 400) {
+        throw new Error(res.statusText);
+    }
+
+    return cheerio.load(await res.text());
 };
 
 /**
