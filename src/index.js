@@ -4,5 +4,7 @@ module.exports = {
     getIndexData: require("./parser/getIndexData"),
     getGroupData: require("./parser/getGroupData"),
     getRankingData: require("./parser/getRankingData"),
-    getSeriesList: require("./parser/getSeriesList")
+    getSeriesList: require("./parser/getSeriesList"),
+    getGenres: require("./parser/getGenres"),
+    getTagsList: require("./parser/getTagsList")
 };
