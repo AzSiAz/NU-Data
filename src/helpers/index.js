@@ -26,4 +26,22 @@ const mapSeries = (_, el) => {
     };
 };
 
-module.exports = { getPagination, mapSeries };
+const mapSidebar = (_, el) => {
+    el = cheerio(el);
+
+    const s = el.text().trim();
+
+    if (s && s !== "N/A") {
+        return {
+            name: el.text().trim(),
+            link: el.attr("href")
+        };
+    }
+};
+
+const decodeEntities = (s) =>
+    cheerio("<div/>")
+        .html(s)
+        .text();
+
+module.exports = { getPagination, mapSeries, mapSidebar, decodeEntities };

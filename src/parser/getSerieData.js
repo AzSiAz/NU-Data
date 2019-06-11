@@ -1,7 +1,12 @@
 const fetch = require("isomorphic-fetch");
 const cheerio = require("cheerio");
 const moment = require("moment");
-const { getPagination, mapSeries } = require("../helpers");
+const {
+    decodeEntities,
+    getPagination,
+    mapSeries,
+    mapSidebar
+} = require("../helpers");
 
 const getTitle = ($) => {
     return $(".seriestitlenu")
@@ -28,13 +33,15 @@ const getRawSynopsis = ($) => $("#editdescription").html();
 const getDifferName = ($) =>
     $("#editassociated")
         .html()
-        .split("<br>");
+        .split("<br>")
+        .map(decodeEntities);
 
 /**
  * @param {CheerioStatic}
  */
 const getTextNodes = ($) =>
     $(".wpb_wrapper")
+        .eq(1)
         .contents()
         .filter(
             (_, el) => el.type === "text" && /^\(.*\)$/.test(el.data.trim())
@@ -52,7 +59,10 @@ const getTextNodes = ($) =>
  * @param {CheerioStatic} $
  */
 const getRelatedSerie = ($, types) => {
-    const rs = $("h5.seriesother:nth-child(8)")
+    const rs = $(".wpb_wrapper")
+        .eq(1)
+        .find("h5.seriesother")
+        .eq(1)
         .nextUntil(".seriesother")
         .map(mapSeries)
         .get();
@@ -65,7 +75,10 @@ const getRelatedSerie = ($, types) => {
  * @param {CheerioStatic} $
  */
 const getRecommendations = ($, types, rsLen) => {
-    const rm = $("h5.seriesother:nth-child(19)")
+    const rm = $(".wpb_wrapper")
+        .eq(1)
+        .find("h5.seriesother")
+        .eq(2)
         .nextUntil("div")
         .map(mapSeries)
         .get();
@@ -86,26 +99,14 @@ const getType = ($) => {
 const getGenres = ($) => {
     return $("#seriesgenre")
         .children()
-        .map((i, el) => {
-            el = $(el);
-            return {
-                genre: el.text().trim(),
-                link: el.attr("href")
-            };
-        })
+        .map(mapSidebar)
         .get();
 };
 
 const getTags = ($) => {
     return $("#showtags")
         .children()
-        .map((_, el) => {
-            el = $(el);
-            return {
-                tag: el.text().trim(),
-                link: el.attr("href")
-            };
-        })
+        .map(mapSidebar)
         .get();
 };
 
@@ -136,48 +137,21 @@ const getRatings = ($) => {
 const getLang = ($) => {
     return $("#showlang")
         .children()
-        .map((_, el) => {
-            el = $(el);
-            if (el.text().trim() !== "") {
-                return {
-                    language: el.text().trim(),
-                    link: el.attr("href")
-                };
-            }
-        })
+        .map(mapSidebar)
         .get();
 };
 
 const getAuthors = ($) => {
     return $("#showauthors")
         .children()
-        .map((_, el) => {
-            el = $(el);
-            if (el.text().trim() !== "") {
-                return {
-                    name: el.text().trim(),
-                    link: el.attr("href")
-                };
-            }
-        })
+        .map(mapSidebar)
         .get();
 };
 
 const getArtists = ($) => {
     return $("#showartists")
         .children()
-        .map((_, el) => {
-            el = $(el);
-
-            const s = el.text().trim();
-
-            if (s && s !== "N/A") {
-                return {
-                    name: el.text().trim(),
-                    link: el.attr("href")
-                };
-            }
-        })
+        .map(mapSidebar)
         .get();
 };
 
@@ -209,15 +183,7 @@ const getOriginPublisher = ($) => {
 const getEnglishPublisher = ($) => {
     return $("#showepublisher")
         .children()
-        .map((i, el) => {
-            el = $(el);
-            if (el.text().trim() !== "") {
-                return {
-                    name: el.text().trim(),
-                    link: el.attr("href")
-                };
-            }
-        })
+        .map(mapSidebar)
         .get();
 };
 
@@ -277,7 +243,7 @@ const getPageWithData = (title, page = 1) => {
                 return response.text();
             })
             .then(function(body) {
-                res(cheerio.load(body, { decodeEntities: false }));
+                res(cheerio.load(body, { decodeEntities: true }));
             });
     });
 };
