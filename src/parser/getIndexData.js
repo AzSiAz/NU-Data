@@ -15,7 +15,7 @@ const getIndexData = (page = 1) => {
 };
 
 const indexPageParser = ($) => {
-    return new Promise((res) => {
+    return new Promise((res, rej) => {
         let data;
         try {
             data = getData($);
