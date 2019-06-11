@@ -50,7 +50,7 @@ const parseRow = (_, el) => {
         .replace(/\.\.\.\smore>>|<<less/gm, "")
         .trim();
 
-    const obj = {
+    return {
         id: Number(a.attr("id").replace("sid", "")),
         slug,
         url,
@@ -66,7 +66,6 @@ const parseRow = (_, el) => {
         type: row.find(".orgalign > span").text(),
         genres
     };
-    return obj;
 };
 
 module.exports = getSeriesList;
