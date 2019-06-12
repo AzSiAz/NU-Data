@@ -10,7 +10,11 @@ const parseGenres = ($) =>
             const [genre, description] = $(row)
                 .children()
                 .toArray();
-            if (description.name === "th" || genre.name === "th") return;
+
+            if (genre.tagName !== "td") {
+                return;
+            }
+
             return {
                 genre: $(genre).text(),
                 description: $(description).text()

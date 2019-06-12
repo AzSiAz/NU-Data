@@ -18,7 +18,9 @@ const mapSeries = (_, el) => {
         .text()
         .trim();
 
-    if (!s) return;
+    if (!s) {
+        return;
+    }
 
     return {
         title: s,

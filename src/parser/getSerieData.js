@@ -83,7 +83,7 @@ const getRecommendations = ($, types, rsLen) => {
         .map(mapSeries)
         .get();
 
-    return rm.map((s, i) => ({ ...s, type: Number(types[i + rsLen]) }));
+    return rm.map((s, i) => ({ ...s, votes: Number(types[i + rsLen]) }));
 };
 
 const getType = ($) => {
@@ -126,11 +126,11 @@ const getRatings = ($) => {
     const vote = $(".votetext");
 
     return {
-        1: getVote(vote.eq(0).text()),
-        2: getVote(vote.eq(1).text()),
+        1: getVote(vote.eq(4).text()),
+        2: getVote(vote.eq(3).text()),
         3: getVote(vote.eq(2).text()),
-        4: getVote(vote.eq(3).text()),
-        5: getVote(vote.eq(4).text())
+        4: getVote(vote.eq(1).text()),
+        5: getVote(vote.eq(0).text())
     };
 };
 
@@ -168,15 +168,7 @@ const getLicensed = ($) => /yes/i.test($("#showtranslated").text());
 const getOriginPublisher = ($) => {
     return $("#showopublisher")
         .children()
-        .map((_, el) => {
-            el = $(el);
-            if (el.text().trim() !== "") {
-                return {
-                    name: el.text().trim(),
-                    link: el.attr("href")
-                };
-            }
-        })
+        .map(mapSidebar)
         .get();
 };
 
@@ -295,7 +287,7 @@ const parseSeriePage = ($) => {
     });
 };
 
-const getSerieData = (serie = undefined, page = 1) => {
+const getSerieData = (serie, page = 1) => {
     return new Promise((res, rej) => {
         if (serie === undefined) {
             rej(new Error("You must specify a serie"));
