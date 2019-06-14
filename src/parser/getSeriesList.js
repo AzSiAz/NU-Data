@@ -22,13 +22,13 @@ const parseRow = (_, el) => {
         .trim();
 
     return {
-        id: Number(a.attr("id").replace("sid", "")),
+        id: parseInt(a.attr("id").replace("sid", ""), 10),
         slug,
         url,
         title: a.text(),
         description,
         thumbnail: row.find("img").attr("src"),
-        averageRating: Number(
+        averageRating: parseFloat(
             row
                 .find(".lstrate")
                 .text()
