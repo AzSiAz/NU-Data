@@ -8,34 +8,43 @@ const { getPagination } = require("../helpers");
  */
 const parseRow = (_, el) => {
     const row = cheerio(el);
-    const a = row.find("a").eq(1);
+
+    const a = row.find("div.search_title > a");
+    const id = row.find("div.search_title > span").attr("id").replace("sid", "");
     const url = a.attr("href");
     const slug = url.split("/")[4];
+    const type = row.find(".search_img_nu > .search_ratings > span").text()
+    const thumbnail = row.find("img").attr("src")
     const genres = row
-        .find(".gennew")
+        .find(".search_genre > .gennew")
         .map((_, g) => cheerio(g).text())
         .toArray();
-    const description = row
-        .find(".noveldesc")
+    const rawDescription = row
+        .find(".search_body_nu")
         .text()
         .replace(/\.\.\.\smore>>|<<less/gm, "")
         .trim();
 
+    const description = rawDescription.split(genres.join(" "))[1].replace(/\n/gm, " ")
+    const rating = row
+        .find(".search_img_nu > .search_ratings")
+        .text()
+        .replace(/[()]/g, "")
+        .replace(type, "")
+        .trim()
+    const updateDate = row.find(".search_body_nu > .search_stats > .ss_desk").last().text()
+
     return {
-        id: parseInt(a.attr("id").replace("sid", ""), 10),
+        id: parseInt(id, 10),
         slug,
         url,
         title: a.text(),
         description,
-        thumbnail: row.find("img").attr("src"),
-        averageRating: parseFloat(
-            row
-                .find(".lstrate")
-                .text()
-                .replace(/[()]/g, "")
-        ),
-        type: row.find(".orgalign > span").text(),
-        genres
+        thumbnail,
+        averageRating: parseFloat(rating),
+        type,
+        genres,
+        updateDate
     };
 };
 
@@ -44,7 +53,7 @@ const parseRow = (_, el) => {
  */
 const parsePage = ($) => ({
     ...getPagination($),
-    data: $(".bdrank")
+    data: $(".search_main_box_nu")
         .map(parseRow)
         .toArray()
 });
