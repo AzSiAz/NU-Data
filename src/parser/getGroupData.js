@@ -75,7 +75,7 @@ const getBaseData = ($) => {
 };
 
 const getRelease = ($) => {
-    return $('#myTable > tbody > tr').map((i, el) => {
+    return $('#myTable').last().find("tbody > tr").map((i, el) => {
         el = $(el);
         if (el.find('a').first().text()) {
             return {
