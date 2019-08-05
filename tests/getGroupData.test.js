@@ -1,6 +1,5 @@
 const { getGroupData } = require('../src/index')
 
-
 describe('getGroupData', () => {
 
     test('Should get data from translation group page', async () => {

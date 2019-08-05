@@ -21,7 +21,7 @@ const getGroupData = (group = undefined, page = 1) => {
 };
 
 const groupPageParser = ($) => {
-    return new Promise((res, rej) => {
+    return new Promise((res) => {
         let data;
         try {
             data = getData($);
@@ -73,16 +73,17 @@ const getBaseData = ($) => {
         nbrRelease
     };
 };
-
+// https://www.novelupdates.com/series/kyoukai-senjou-no-horizon/
 const getRelease = ($) => {
     return $('#myTable').last().find("tbody > tr").map((i, el) => {
         el = $(el);
         if (el.find('a').first().text()) {
             return {
                 date: moment.utc(el.children().first().html(), "MM/DD/YY").toDate(),
-                title: el.find('a').last().text().trim(),
-                group: el.find('a').first().text().trim(),
-                link: el.find('a').last().attr('href')
+                title: el.find('a').first().text().trim(),
+                novelSlug: el.find('a').first().attr("href").trim().split("/")[4],
+                chapter: el.find('a').last().text().trim(),
+                chapterLink: el.find('a').last().attr('href')
             };
         }
     }).get();
