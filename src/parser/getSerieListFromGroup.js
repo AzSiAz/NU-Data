@@ -25,6 +25,7 @@ const getPageWithData = async (slug) => {
 const extractData = ($) => {
     return $("#grouplst > option").map((i, element) => {
         const el = $(element);
+        if (el.text() !== "" && el.text() !== "---")
         return {
             title: el.text().trim(),
             slug: el.attr("value").split("/")[4].trim(),
