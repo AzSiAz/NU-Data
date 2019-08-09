@@ -1,58 +1,66 @@
+// @ts-check
 const fetch = require('isomorphic-fetch');
 const cheerio = require('cheerio');
 const moment = require('moment');
 
 /**
- *
- *
+ * @typedef {Object} GroupData
+ * @property {string} title
+ * @property {string} url
+ * @property {string} nbrRelease
+ * @property {Release} release
+ * 
+ * @typedef {Object} ReleaseRow
+ * @property {Date} date
+ * @property {string} title
+ * @property {string} novelSlug
+ * @property {string} chapter
+ * @property {string} chapterLink
+ * 
+ * @typedef {Object} Release
+ * @property {number} page
+ * @property {number} pageMax
+ * @property {ReleaseRow[]} data
  */
-const getGroupData = (group = undefined, page = 1) => {
-    return new Promise((res, rej) => {
-        if (group === undefined) { rej(new Error("You must specify a group")); }
-        group = sanatizeGroupName(group);
-        getPageWithData(group, page).then($ => {
-            return groupPageParser($);
-        }).then(resolved => {
-            res(resolved);
-        }).catch(err => {
-            rej(err);
-        });
-    });
+
+/**
+ * @param {string} groupSlug slug for group
+ * @param {number} page page number
+ * @returns {Promise<GroupData>}
+ */
+const getGroupData = async (groupSlug = undefined, page = 1) => {
+    if (groupSlug === undefined || groupSlug === "" || groupSlug === null) { 
+        throw new Error("You must specify a group slug");
+    }
+
+    const $ = await getPageWithData(groupSlug, page)
+
+    return extractData($)
 };
 
-const groupPageParser = ($) => {
-    return new Promise((res) => {
-        let data;
-        try {
-            data = getData($);
-        }
-        catch (e) {
-            throw e;
-        }
-        finally {
-            res(data);
-        }
-    });
-};
 
-const getData = ($) => {
-    let primaryData = getBaseData($);
-    return {
-        name: primaryData.title,
-        link: primaryData.url,
-        nbrRelease: primaryData.nbrRelease,
-        release: {
-            page: getReleasePage($) || 1,
-            pageMax: getReleasePageMax($) || 1,
-            data: getRelease($),
-        }
-    };
-};
+/**
+ * @param {CheerioStatic} $ 
+ * @returns {GroupData}
+ */
+const extractData = ($) => ({
+    ...getBaseData($),
+    release: {
+        page: getReleasePage($) || 1,
+        pageMax: getReleasePageMax($) || 1,
+        data: getRelease($),
+    }
+});
 
+
+/**
+ * @param {CheerioStatic} $
+ * @returns {{title: string, url: string, nbrRelease: string}}
+ */
 const getBaseData = ($) => {
     let title, url, nbrRelease;
-    $('table').first().find('tr').map((i, el) => {
-        el = $(el);
+    $('table').first().find('tr').map((i, element) => {
+        const el = $(element);
         if (el.find('td').text() !== "") {
             switch (i) {
                 case 1:
@@ -73,10 +81,16 @@ const getBaseData = ($) => {
         nbrRelease
     };
 };
+
+
 // https://www.novelupdates.com/series/kyoukai-senjou-no-horizon/
+/**
+ * @param {CheerioStatic} $
+ * @returns {ReleaseRow[]}
+ */
 const getRelease = ($) => {
-    return $('#myTable').last().find("tbody > tr").map((i, el) => {
-        el = $(el);
+    return $('#myTable').last().find("tbody > tr").map((i, element) => {
+        const el = $(element);
         if (el.find('a').first().text()) {
             return {
                 date: moment.utc(el.children().first().html(), "MM/DD/YY").toDate(),
@@ -89,34 +103,42 @@ const getRelease = ($) => {
     }).get();
 };
 
-const getReleasePage = ($) => {
-    return $('.digg_pagination').find('em').text().trim();
-};
 
+/**
+ * @param {CheerioStatic} $
+ * @returns {number}
+ */
+const getReleasePage = ($) => parseInt($('.digg_pagination').find('em').text().trim(), 10);
+
+
+/**
+ * @param {CheerioStatic} $
+ * @returns {number}
+ */
 const getReleasePageMax = ($) => {
     let last = $('.digg_pagination').children().last();
-    if (last.hasClass('current')) { return last.text().trim(); }
-    else { return last.prev().text().trim(); }
+    if (last.hasClass('current')) { 
+        return parseInt(last.text().trim(), 10); 
+    } else { 
+        return parseInt(last.prev().text().trim(), 10);
+    }
 };
 
-const sanatizeGroupName = (title) => {
-    title = title.trim();
-    title = title.replace(/ /g, "-");
-    return title.toLowerCase();
-};
 
-const getPageWithData = (group, page = 1) => {
-    return new Promise((res, rej) => {
-        fetch(`https://www.novelupdates.com/group/${group}/?pg=${page}`).then(function (response) {
-            if (response.status >= 400) {
-                rej(Error("Bad response from server"));
-            }
-            return response.text();
-        })
-            .then(function (body) {
-                res(cheerio.load(body));
-            });
-    });
+/**
+ * @param {string} group
+ * @param {number} page
+ * @returns {Promise<CheerioStatic>}
+ */
+const getPageWithData = async (group, page) => {
+    const response = await fetch(`https://www.novelupdates.com/group/${group}/?pg=${page}`)
+    if (response.status >= 400) {
+        throw new Error("Bad response from server");
+    }
+
+    const body = await response.text();
+    
+    return cheerio.load(body)
 };
 
 module.exports = getGroupData;

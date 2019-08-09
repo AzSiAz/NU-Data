@@ -1,250 +1,339 @@
+// @ts-check
 const fetch = require('isomorphic-fetch');
 const cheerio = require('cheerio');
 const moment = require('moment');
 
 
-const getSerieData = (serie = undefined, page = 1) => {
-    return new Promise((res, rej) => {
-        if (serie === undefined) { rej(new Error("You must specify a serie")); }
-        serie = sanatizeSerieName(serie);
+/**
+ * @param {string} serie
+ * @param {number} page
+ */
+const getSerieData = async (serie = undefined, page = 1) => {
+    if (serie === undefined) { throw new Error("You must specify a serie") }
 
-        getPageWithData(serie, page).then($ => {
-            return parseSeriePage($);
-        }).then(resolved => {
-            res(resolved);
-        }).catch(err => {
-            rej(err);
-        });
-    });
+    const $ = await getPageWithData(serie, page)
+    
+    return getData($); 
 };
 
-const parseSeriePage = ($) => {
-    return new Promise((res, rej) => {
-        let data;
-        try {
-            data = getData($);
-        }
-        catch (e) {
-            rej(e);
-        }
-        finally {
-            res(data);
-        }
-    });
-};
 
-const getData = ($) => {
-    return {
-        Title: getTitle($),
-        cover: getCover($),
-        Synopsis: getSynopsis($),
-        Associated_Names: getDifferName($),
-        Related: getRelatedSerie($),
-        Recommendations: getRecommendations($),
-        Type: getType($),
-        Genres: getGenres($),
-        Tags: getTags($),
-        Ratings: getRatings($),
-        Languages: getLang($),
-        Authors: getAuthors($),
-        Artists: getArtists($),
-        Year: getYear($),
-        StatusCountryOrigin: getStatusCountryOrigin($),
-        Licensed: getLicensed($),
-        Origin_Publisher: getOriginPublisher($),
-        EnglishPublisher: getEnglishPublisher($),
-        Release: {
-            page: getReleasePage($) || 1,
-            pageMax: getReleasePageMax($) || 1,
-            data: getRelease($),
-        }
-    };
-};
-
-const getTitle = ($) => {
-    return $('.seriestitlenu').text().trim();
-};
-
-const getCover = ($) => {
-    return $('.seriesimg').children().first('img').attr('src');
-};
-
-const getSynopsis = ($) => {
-    return $('#editdescription').children().text().trim();
-};
-
-const getDifferName = ($) => {
-    let text = $('#editassociated').text();
-    if (text.match(/[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\u3400-\u4dbf]/g)) {
-        return [text];
+/**
+ * @param {CheerioStatic} $
+ */
+const getData = ($) => ({
+    title: getTitle($),
+    cover: getCover($),
+    synopsis: getSynopsis($),
+    associatedNames: getDifferName($),
+    related: getRelatedSerie($),
+    recommendations: getRecommendations($),
+    type: getType($),
+    genres: getGenres($),
+    tags: getTags($),
+    ratings: getRatings($),
+    languages: getLang($),
+    authors: getAuthors($),
+    artists: getArtists($),
+    year: getYear($),
+    statusCountryOrigin: getStatusCountryOrigin($),
+    licensed: getLicensed($),
+    originPublisher: getOriginPublisher($),
+    englishPublisher: getEnglishPublisher($),
+    release: {
+        page: getReleasePage($) || 1,
+        pageMax: getReleasePageMax($) || 1,
+        data: getRelease($),
     }
+});
+
+
+/**
+ * @param {CheerioStatic} $
+ * @returns {string}
+ */
+const getTitle = ($) => $('.seriestitlenu').text().trim();
+
+
+/**
+ * @param {CheerioStatic} $
+ * @returns {string}
+ */
+const getCover = ($) => $('.seriesimg').children().first().attr('src');
+
+/**
+ * @param {CheerioStatic} $
+ * @returns {string}
+ */
+const getSynopsis = ($) => $('#editdescription').children().text().trim();
+
+
+/**
+ * @param {CheerioStatic} $
+ * @returns {string[]}
+ */
+const getDifferName = ($) => {
+    // let text = $('#editassociated').text();
+    // if (text.match(/[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\u3400-\u4dbf]/g)) {
+    //     return [text];
+    // }
     return $('#editassociated').html().split("<br>").map(i => i.replace(/[\n\t\r]/g, "").trim());
 };
 
+
+/**
+ * @param {CheerioStatic} $
+ * @returns {{title: string, slug: string, url: string}[]}
+ */
 const getRelatedSerie = ($) => {
     return $('#editassociated').next('.seriesother').nextUntil('.seriesother').map((i, el) => {
         if (($(el).text().trim() !== '')) {
             return {
                 title: $(el).text().trim(),
-                link: $(el).attr("href")
+                slug: $(el).attr("href").split("/")[4].trim(),
+                url: $(el).attr("href"),
             };
         }
     }).get();
 };
 
+
+/**
+ * @param {CheerioStatic} $
+ * @returns {{title: string, slug: string, url: string}[]}
+ */
 const getRecommendations = ($) => {
-    return $('#editassociated').siblings('.seriesother').next('.seriesother').nextUntil('.seriesother').map((i, el) => {
-        if (($(el).text().trim() !== '')) { return $(el).text().trim(); }
-    }).get();
+    // Recommendations
+    return $(".seriesother").filter((i, element) => $(element).text() === "Recommendations").nextUntil(".seriesother").map((i, element) => {
+        const el = $(element)
+        if ((el.text().trim() !== '')) { 
+            return {
+                title: el.text().trim(),
+                slug: el.attr('href').split("/")[4].trim(),
+                url: el.attr('href')
+            }
+        }
+    }).get()
 };
 
+
+/**
+ * @param {CheerioStatic} $
+ * @returns {{type: string, slug: string, url: string}}
+ */
 const getType = ($) => {
     let el = $('#showtype').children().first();
     return {
         type: el.text().trim(),
-        link: el.attr('href')
+        slug: el.attr('href').split("/")[4].trim(),
+        url: el.attr('href')
     };
 };
 
+
+/**
+ * @param {CheerioStatic} $
+ * @returns {{genre: string, slug: string, url: string}[]}
+ */
 const getGenres = ($) => {
-    return $('#seriesgenre').children().map((i, el) => {
-        el = $(el);
+    return $('#seriesgenre').children().map((i, element) => {
+        const el = $(element);
         return {
             genre: el.text().trim(),
-            link: el.attr('href')
+            slug: el.attr('href').split("/")[4].trim(),
+            url: el.attr('href')
         };
     }).get();
 };
 
+
+/**
+ * @param {CheerioStatic} $
+ * @returns {{tag: string, slug: string, url: string}[]}
+ */
 const getTags = ($) => {
-    return $('#showtags').children().map((i, el) => {
-        el = $(el);
+    return $('#showtags').children().map((i, element) => {
+        const el = $(element);
         return {
-            genre: el.text().trim(),
+            tag: el.text().trim(),
+            slug: el.attr('href').split("/")[4].trim(),
             link: el.attr('href')
         };
     }).get();
 };
 
-const getRatings = ($) => {
-    return $('.uvotes').text().trim();
-};
 
+/**
+ * @param {CheerioStatic} $
+ * @returns {string}
+ */
+const getRatings = ($) => $('.uvotes').text().trim().replace(/[()]/g, "")
+
+
+/**
+ * @param {CheerioStatic} $
+ * @returns {{language: string, slug: string, url: string}[]}
+ */
 const getLang = ($) => {
-    return $('#showlang').children().map((i, el) => {
-        el = $(el);
+    return $('#showlang').children().map((i, element) => {
+        const el = $(element);
         if (el.text().trim() !== '') {
             return {
                 language: el.text().trim(),
-                link: el.attr('href')
+                slug: el.attr('href').split("/")[4].trim(),
+                url: el.attr('href')
             };
         }
     }).get();
 };
 
+
+/**
+ * @param {CheerioStatic} $
+ * @returns {{name: string, slug: string, url: string}[]}
+ */
 const getAuthors = ($) => {
-    return $('#showauthors').children().map((i, el) => {
-        el = $(el);
+    return $('#showauthors').children().map((i, element) => {
+        const el = $(element);
         if (el.text().trim() !== '') {
             return {
                 name: el.text().trim(),
-                link: el.attr('href')
+                slug: el.attr('href').split("/")[4].trim(),
+                url: el.attr('href')
             };
         }
     }).get();
 };
 
+
+/**
+ * @param {CheerioStatic} $
+ * @returns {{name: string, slug: string, url: string}[]}
+ */
 const getArtists = ($) => {
-    return $('#showartists').children().map((i, el) => {
-        el = $(el);
+    return $('#showartists').children().map((i, element) => {
+        const el = $(element);
         if (el.text().trim() !== '') {
             return {
                 name: el.text().trim(),
-                link: el.attr('href')
+                slug: el.attr('href').split("/")[4].trim(),
+                url: el.attr('href')
             };
         }
     }).get();
 };
 
-const getYear = ($) => {
-    return parseInt($('#edityear').text(), 10);
-};
 
-const getStatusCountryOrigin = ($) => {
-    return $('#editstatus').text().replace(/[\n\t\r]/g, "").trim();
-};
+/**
+ * @param {CheerioStatic} $
+ * @returns {number}
+ */
+const getYear = ($) => parseInt($('#edityear').text(), 10);
 
-const getLicensed = ($) => {
-    return $('#showtranslated').text().trim();
-};
 
+/**
+ * @param {CheerioStatic} $
+ * @returns {string}
+ */
+const getStatusCountryOrigin = ($) => $('#editstatus').text().replace(/[\n\t\r]/g, "").trim();
+
+
+/**
+ * @param {CheerioStatic} $
+ * @returns {string}
+ */
+const getLicensed = ($) => $('#showtranslated').text().trim();
+
+
+/**
+ * @param {CheerioStatic} $
+ * @returns {{name: string, slug: string, url: string}[]}
+ */
 const getOriginPublisher = ($) => {
-    return $('#showopublisher').children().map((i, el) => {
-        el = $(el);
+    return $('#showopublisher').children().map((i, element) => {
+        const el = $(element);
         if (el.text().trim() !== '') {
             return {
                 name: el.text().trim(),
-                link: el.attr('href')
+                slug: el.attr('href').split("/")[4].trim(),
+                url: el.attr('href')
             };
         }
     }).get();
 };
 
+
+/**
+ * @param {CheerioStatic} $
+ * @returns {{name: string, slug: string, url: string}[]}
+ */
 const getEnglishPublisher = ($) => {
-    return $('#showepublisher').children().map((i, el) => {
-        el = $(el);
-        if (el.text().trim() !== '') {
+    return $('#showepublisher').children().map((i, element) => {
+        const el = $(element);
+
+        if (el.text().trim() !== '' && el.text().trim() != 'N/A') {
             return {
                 name: el.text().trim(),
-                link: el.attr('href')
+                slug: el.attr('href').split("/")[4].trim(),
+                url: el.attr('href')
             };
         }
     }).get();
 };
 
+
+/**
+ * @param {CheerioStatic} $
+ * @returns {{date: Date, group: string, groupSlug: string, chapter: string, chapterLink: string}[]}
+ */
 const getRelease = ($) => {
-    return $('#myTable > tbody > tr').map((i, el) => {
-        el = $(el);
+    return $('#myTable > tbody > tr').map((i, element) => {
+        const el = $(element);
         if (el.find('a').first().text()) {
             return {
                 date: moment.utc(el.children().first().html(), "MM/DD/YY").toDate(),
-                title: el.find('a').last().text().trim(),
                 group: el.find('a').first().text().trim(),
-                link: el.find('a').last().attr('href')
+                groupSlug: el.find('a').first().attr("href").trim().split("/")[4],
+                chapter: el.find('a').last().text().trim(),
+                chapterLink: el.find('a').last().attr('href')
             };
         }
     }).get();
 };
 
-const getReleasePage = ($) => {
-    return $('.digg_pagination').find('em').text().trim();
-};
 
+/**
+ * @param {CheerioStatic} $
+ * @returns {number}
+ */
+const getReleasePage = ($) => parseInt($('.digg_pagination').find('em').text().trim(), 10)
+
+
+/**
+ * @param {CheerioStatic} $
+ * @returns {number}
+ */
 const getReleasePageMax = ($) => {
     let last = $('.digg_pagination').children().last();
-    if (last.hasClass('current')) { return last.text().trim(); }
-    else { return last.prev().text().trim(); }
+
+    return last.hasClass('current') ? parseInt(last.text().trim(), 10) : parseInt(last.prev().text().trim(), 10)
 };
 
 
-const sanatizeSerieName = (title) => {
-    title = title.trim();
-    title = title.replace(/ /g, "-");
-    return title.toLowerCase();
-};
+/**
+ * @param {string} title
+ * @param {number} page
+ * @returns {Promise<CheerioStatic>}
+ */
+const getPageWithData = async (title, page = 1) => {
 
-const getPageWithData = (title, page = 1) => {
-    return new Promise((res, rej) => {
-        fetch(`https://www.novelupdates.com/series/${title}/?pg=${page}`).then(function (response) {
-            if (response.status >= 400) {
-                rej(Error("Bad response from server"));
-            }
-            return response.text();
-        })
-            .then(function (body) {
-                res(cheerio.load(body));
-            });
-    });
+    const response = await fetch(`https://www.novelupdates.com/series/${title}/?pg=${page}`)
+        if (response.status >= 400) {
+            throw new Error("Bad response from server")
+        }
+           
+    const body = await response.text()
+
+    return cheerio.load(body)
 };
 
 module.exports = getSerieData;

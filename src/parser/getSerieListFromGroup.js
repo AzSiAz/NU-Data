@@ -1,5 +1,7 @@
+//@ts-check
 const cheerio = require("cheerio")
 const fetch = require("isomorphic-fetch")
+
 
 /**
  * @param {string} slug
@@ -15,27 +17,31 @@ const getPageWithData = async (slug) => {
     return cheerio.load(await res.text());
 };
 
+
 /**
  * @param {CheerioStatic} $ 
+ * @returns {{title: string, url: string, slug: string}[]}
  */
-const parsePage = ($) => {
-    return $("#grouplst > option").map((i, rawEl) => {
-        const el = $(rawEl);
+const extractData = ($) => {
+    return $("#grouplst > option").map((i, element) => {
+        const el = $(element);
         return {
             title: el.text().trim(),
-            link: el.attr("value")
+            slug: el.attr("value").split("/")[4].trim(),
+            url: el.attr("value")
         }
     }).get()
 }
 
+
 /**
  * @param {string} slug Slug representing group on novel-update
- * @returns {{title: string, link: string}[]}
+ * @returns {Promise<{title: string, url: string, slug: string}[]>}
  */
 const getSerieListFromGroup = async (slug) => {
     const $ = await getPageWithData(slug)
 
-    return parsePage($)
+    return extractData($)
 }
 
 module.exports = getSerieListFromGroup

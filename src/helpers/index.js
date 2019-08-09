@@ -1,3 +1,8 @@
+/**
+ * getPagination Helper to return pagination for page
+ * @param {CheerioStatic} $ page
+ * @returns {{page: number, pageMax: number}}
+ */
 const getPagination = ($) => {
     const last = $("div.digg_pagination")
         .children()

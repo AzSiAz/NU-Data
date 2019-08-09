@@ -1,13 +1,43 @@
+// @ts-check
 const fetch = require('isomorphic-fetch');
 const cheerio = require('cheerio');
 
+/**
+ * 
+ * @typedef {Object} RankingData
+ * @property {number} page
+ * @property {number} pageMax
+ * @property {Novel[]} data
+ * 
+ * @typedef {Object} Novel
+ * @property {string} title
+ * @property {string} url
+ * @property {string} rank
+ * @property {number} rating
+ * @property {string} lang
+ * @property {string} genres
+ * @property {string} synopsis
+ * @property {string} nbrRelease
+ */
 
+
+/**
+ * @param {string} type
+ * @param {number} page
+ * @returns {Promise<RankingData>}
+ */
 const getRankingData = async (type = 'popular', page = 1) => {
     type = switchType(type);
-    let $ = await getPageWithData(type, page).catch(err => { return Promise.reject(err) })
-    return RankingPageParser($);
+    const $ = await getPageWithData(type, page).catch(err => { return Promise.reject(err) })
+
+    return extractData($);
 };
 
+
+/**
+ * @param {string} type 
+ * @returns {string}
+ */
 const switchType = (type) => {
     switch (type) {
         case 'popular':
@@ -18,76 +48,103 @@ const switchType = (type) => {
     }
 };
 
-const RankingPageParser = async ($) => {
-    try {
-        let data = await getData($);
-        return data
-    }
-    catch (e) {
-        return Promise.reject(e);
-    }
-};
 
-const getData = async ($) => {
-    return {
-        page: getCurrentPage($),
-        pageMax: getMaxPage($),
-        data: ParseTableData($)
-    };
-};
+/**
+ * @param {CheerioStatic} $
+ * @returns {RankingData}
+ */
+const extractData = ($) => ({
+    page: getCurrentPage($),
+    pageMax: getMaxPage($),
+    data: parseTableData($)
+});
 
-const ParseTableData = ($) => {
-    return $('#myTable > tbody > tr').map((i, el) => {
-        el = $(el);
+
+/**
+ * @param {CheerioStatic} $ 
+ * @returns {Novel[]}
+ */
+const parseTableData = ($) => {
+    return $('.search_main_box_nu').map((i, element) => {
+        const el = $(element);
         return {
-            title: el.children().last().find('a').last().text().trim(),
-            link: el.children().last().find('a').last().attr('href'),
-            number: el.find('span.ranknum').text().trim(),
-            lang: el.find('td.orgalign').text(),
-            genre: getGenre($, el),
-            synpsis: getSynopsis($, el),
-            nbrRelease: el.children().last().find('.sfstext').last().html().split('</b>')[1]
+            title: el.find('.search_body_nu .search_title a').text().trim(),
+            url: el.find('.search_body_nu .search_title a').attr('href').trim(),
+            cover: el.find('.search_img_nu > img').attr('src'),
+            rank: el.find('.search_body_nu .search_title .genre_rank').text().split("#")[1].trim(),
+            lang: el.find('.search_img_nu .search_ratings span').text(),
+            rating: parseFloat(el.find(".search_img_nu .search_ratings").text().replace(/[^0-9.,]+/, "")),
+            genres: getGenre(el, $),
+            nbrRelease: el.find('.search_body_nu .search_stats .ss_desk').first().text().trim(),
+            synopsis: getSynopsis(el),
         };
     }).get();
 };
 
-const getSynopsis = ($, el) => {
-    let text = el.children().last().find('.noveldesc').last().text();
-    let text2 = text.split('... more>>');
-    let text3 = text2[1].split('<<less');
-    text = text2[0] + text3[0];
-    return text.replace(/[\n\t\r]/g, ' ').trim();
+
+/**
+ * @param {Cheerio} el 
+ * @returns {string}
+ */
+const getSynopsis = (el) => {
+    el.find(".search_body_nu .search_title").remove()
+    el.find(".search_body_nu .search_stats").remove()
+    el.find(".search_body_nu .search_genre").remove()
+
+    el.find(".search_body_nu .dots").remove()
+    el.find(".search_body_nu .morelink.list").remove()
+    el.find(".search_body_nu .testhide p").remove()
+    el.find(".search_body_nu .testhide .morelink.list").remove()
+
+    return el.find('.search_body_nu').text().trim().replace(/[\n\t\r]/g, " ")
 };
 
-const getGenre = ($, el) => {
-    return el.children().last().find('.rankgenre').children().map((i, el2) => {
-        el2 = $(el2);
+
+/**
+ * @param {Cheerio} el
+ * @param {CheerioStatic} $
+ * @returns {string[]}
+ */
+const getGenre = (el, $) => {
+    return el.find('.search_body_nu .search_genre .gennew.search').map((i, element) => {
+        const el2 = $(element);
         return el2.text();
     }).get();
 };
 
+
+/**
+ * @param {CheerioStatic} $
+ * @returns {number}
+ */
 const getMaxPage = ($) => {
-    return ($('div.digg_pagination').children().last().hasClass('next_page')) ?
-        $('div.digg_pagination').children().last().prev().text() : $('div.digg_pagination').children().last().text();
+    const el = $('div.digg_pagination').children().last()
+    
+    return (el.hasClass('next_page')) ? parseInt(el.prev().text(), 10) : parseInt(el.text(), 10);
 };
 
-const getCurrentPage = ($) => {
-    return $('em.current').text();
-};
 
+/**
+ * @param {CheerioStatic} $
+ * @returns {number}
+ */
+const getCurrentPage = ($) => parseInt($('em.current').text(), 10)
+
+
+/**
+ * @param {string} type
+ * @param {number} page
+ * @returns {Promise<CheerioStatic>}
+ */
 const getPageWithData = async (type = 'popular', page = 1) => {
-    try {
-        let response = await fetch(`https://www.novelupdates.com/series-ranking/?rank=${type}&pg=${page}`)
-        if (response.status >= 400) {
-            return Promise.reject(new Error('Bad response from server'))
-        }
-        let body = await response.text()
-        return cheerio.load(body)
-    }
-    catch (err) {
-        return Promise.reject(new Error(`Can't download html for https://www.novelupdates.com/series-ranking/?rank=${type}&pg=${page}`))
+    const response = await fetch(`https://www.novelupdates.com/series-ranking/?rank=${type}&pg=${page}`)
+    if (response.status >= 400) {
+        throw new Error('Bad response from server')
     }
 
+    const body = await response.text()
+    
+    return cheerio.load(body)
 };
 
 module.exports = getRankingData;
