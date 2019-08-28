@@ -1,5 +1,5 @@
 // @ts-check
-const fetch = require('isomorphic-fetch');
+const { get } = require('httpie');
 const cheerio = require('cheerio');
 
 /**
@@ -119,7 +119,7 @@ const getGenre = (el, $) => {
  */
 const getMaxPage = ($) => {
     const el = $('div.digg_pagination').children().last()
-    
+
     return (el.hasClass('next_page')) ? parseInt(el.prev().text(), 10) : parseInt(el.text(), 10);
 };
 
@@ -137,14 +137,12 @@ const getCurrentPage = ($) => parseInt($('em.current').text(), 10)
  * @returns {Promise<CheerioStatic>}
  */
 const getPageWithData = async (type = 'popular', page = 1) => {
-    const response = await fetch(`https://www.novelupdates.com/series-ranking/?rank=${type}&pg=${page}`)
-    if (response.status >= 400) {
+    const response = await get(`https://www.novelupdates.com/series-ranking/?rank=${type}&pg=${page}`)
+    if (response.statusCode >= 400) {
         throw new Error('Bad response from server')
     }
 
-    const body = await response.text()
-    
-    return cheerio.load(body)
+    return cheerio.load(response.data)
 };
 
 module.exports = getRankingData;

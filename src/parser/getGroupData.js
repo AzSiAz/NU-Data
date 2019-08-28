@@ -1,5 +1,5 @@
 // @ts-check
-const fetch = require('isomorphic-fetch');
+const { get } = require('httpie');
 const cheerio = require('cheerio');
 const moment = require('moment');
 
@@ -29,7 +29,7 @@ const moment = require('moment');
  * @returns {Promise<GroupData>}
  */
 const getGroupData = async (groupSlug = undefined, page = 1) => {
-    if (groupSlug === undefined || groupSlug === "" || groupSlug === null) { 
+    if (groupSlug === undefined || groupSlug === "" || groupSlug === null) {
         throw new Error("You must specify a group slug");
     }
 
@@ -117,9 +117,9 @@ const getReleasePage = ($) => parseInt($('.digg_pagination').find('em').text().t
  */
 const getReleasePageMax = ($) => {
     let last = $('.digg_pagination').children().last();
-    if (last.hasClass('current')) { 
-        return parseInt(last.text().trim(), 10); 
-    } else { 
+    if (last.hasClass('current')) {
+        return parseInt(last.text().trim(), 10);
+    } else {
         return parseInt(last.prev().text().trim(), 10);
     }
 };
@@ -131,14 +131,12 @@ const getReleasePageMax = ($) => {
  * @returns {Promise<CheerioStatic>}
  */
 const getPageWithData = async (group, page) => {
-    const response = await fetch(`https://www.novelupdates.com/group/${group}/?pg=${page}`)
-    if (response.status >= 400) {
+    const response = await get(`https://www.novelupdates.com/group/${group}/?pg=${page}`)
+    if (response.statusCode >= 400) {
         throw new Error("Bad response from server");
     }
 
-    const body = await response.text();
-    
-    return cheerio.load(body)
+    return cheerio.load(response.data)
 };
 
 module.exports = getGroupData;

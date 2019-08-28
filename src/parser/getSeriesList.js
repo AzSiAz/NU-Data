@@ -1,6 +1,6 @@
 //@ts-check
 const cheerio = require("cheerio");
-const fetch = require("isomorphic-fetch");
+const { get } = require("httpie");
 const { getPagination } = require("../helpers");
 
 
@@ -67,12 +67,12 @@ const extractData = ($) => ({
  * @returns {Promise<CheerioStatic>}
  */
 const getPageWithData = async (page) => {
-    const res = await fetch(`https://www.novelupdates.com/novelslisting/?st=1&pg=${page}`);
-    if (res.status >= 400) {
-        throw new Error(res.statusText);
+    const res = await get(`https://www.novelupdates.com/novelslisting/?st=1&pg=${page}`);
+    if (res.statusCode >= 400) {
+        throw new Error(res.statusMessage);
     }
 
-    return cheerio.load(await res.text());
+    return cheerio.load(res.data);
 };
 
 

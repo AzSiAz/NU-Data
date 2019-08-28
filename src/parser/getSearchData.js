@@ -1,5 +1,5 @@
 // @ts-check
-const fetch = require('isomorphic-fetch');
+const { get } = require('httpie');
 const cheerio = require('cheerio');
 
 /**
@@ -111,14 +111,12 @@ const getCurrentPage = ($) => parseInt($('.page-numbers.current').text());
  * @returns {Promise<CheerioStatic>}
  */
 const getPageWithData = async (word = "", page = 1) => {
-    const response = await fetch(`https://novelupdates.com/page/${page}/?s=${word}&post_type=seriesplans`)
-    if (response.status >= 400) {
+    const response = await get(`https://novelupdates.com/page/${page}/?s=${word}&post_type=seriesplans`)
+    if (response.statusCode >= 400) {
         throw new Error("Bad response from server")
     }
 
-    const body = await response.text();
-    
-    return cheerio.load(body)
+    return cheerio.load(response.data)
 };
 
 module.exports = getSearchData;

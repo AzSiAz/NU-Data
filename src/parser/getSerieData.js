@@ -1,5 +1,5 @@
 // @ts-check
-const fetch = require('isomorphic-fetch');
+const { get } = require('httpie');
 const cheerio = require('cheerio');
 const moment = require('moment');
 
@@ -12,8 +12,8 @@ const getSerieData = async (serie = undefined, page = 1) => {
     if (serie === undefined) { throw new Error("You must specify a serie") }
 
     const $ = await getPageWithData(serie, page)
-    
-    return getData($); 
+
+    return getData($);
 };
 
 
@@ -85,8 +85,9 @@ const getDifferName = ($) => {
  * @returns {{title: string, slug: string, url: string}[]}
  */
 const getRelatedSerie = ($) => {
-    return $('#editassociated').next('.seriesother').nextUntil('.seriesother').map((i, el) => {
-        if (($(el).text().trim() !== '')) {
+    return $('#editassociated').next('.seriesother').nextUntil('.seriesother').map((i, element) => {
+        const el = $(element)
+        if (el.text().trim() !== '' && el.text().trim() != 'N/A') {
             return {
                 title: $(el).text().trim(),
                 slug: $(el).attr("href").split("/")[4].trim(),
@@ -105,7 +106,7 @@ const getRecommendations = ($) => {
     // Recommendations
     return $(".seriesother").filter((i, element) => $(element).text() === "Recommendations").nextUntil(".seriesother").map((i, element) => {
         const el = $(element)
-        if ((el.text().trim() !== '')) { 
+        if (el.text().trim() !== '' && el.text().trim() != 'N/A') {
             return {
                 title: el.text().trim(),
                 slug: el.attr('href').split("/")[4].trim(),
@@ -122,11 +123,13 @@ const getRecommendations = ($) => {
  */
 const getType = ($) => {
     let el = $('#showtype').children().first();
-    return {
-        type: el.text().trim(),
-        slug: el.attr('href').split("/")[4].trim(),
-        url: el.attr('href')
-    };
+    if (el.text().trim() !== '' && el.text().trim() != 'N/A') {
+        return {
+            type: el.text().trim(),
+            slug: el.attr('href').split("/")[4].trim(),
+            url: el.attr('href')
+        };
+    }
 };
 
 
@@ -137,11 +140,13 @@ const getType = ($) => {
 const getGenres = ($) => {
     return $('#seriesgenre').children().map((i, element) => {
         const el = $(element);
-        return {
-            genre: el.text().trim(),
-            slug: el.attr('href').split("/")[4].trim(),
-            url: el.attr('href')
-        };
+        if (el.text().trim() !== '' && el.text().trim() != 'N/A') {
+            return {
+                genre: el.text().trim(),
+                slug: el.attr('href').split("/")[4].trim(),
+                url: el.attr('href')
+            };
+        }
     }).get();
 };
 
@@ -153,11 +158,13 @@ const getGenres = ($) => {
 const getTags = ($) => {
     return $('#showtags').children().map((i, element) => {
         const el = $(element);
-        return {
-            tag: el.text().trim(),
-            slug: el.attr('href').split("/")[4].trim(),
-            link: el.attr('href')
-        };
+        if (el.text().trim() !== '' && el.text().trim() != 'N/A') {
+            return {
+                tag: el.text().trim(),
+                slug: el.attr('href').split("/")[4].trim(),
+                link: el.attr('href')
+            };
+        }
     }).get();
 };
 
@@ -176,7 +183,7 @@ const getRatings = ($) => $('.uvotes').text().trim().replace(/[()]/g, "")
 const getLang = ($) => {
     return $('#showlang').children().map((i, element) => {
         const el = $(element);
-        if (el.text().trim() !== '') {
+        if (el.text().trim() !== '' && el.text().trim() != 'N/A') {
             return {
                 language: el.text().trim(),
                 slug: el.attr('href').split("/")[4].trim(),
@@ -194,7 +201,7 @@ const getLang = ($) => {
 const getAuthors = ($) => {
     return $('#showauthors').children().map((i, element) => {
         const el = $(element);
-        if (el.text().trim() !== '') {
+        if (el.text().trim() !== '' && el.text().trim() != 'N/A') {
             return {
                 name: el.text().trim(),
                 slug: el.attr('href').split("/")[4].trim(),
@@ -212,7 +219,7 @@ const getAuthors = ($) => {
 const getArtists = ($) => {
     return $('#showartists').children().map((i, element) => {
         const el = $(element);
-        if (el.text().trim() !== '') {
+        if (el.text().trim() !== '' && el.text().trim() != 'N/A') {
             return {
                 name: el.text().trim(),
                 slug: el.attr('href').split("/")[4].trim(),
@@ -251,7 +258,7 @@ const getLicensed = ($) => $('#showtranslated').text().trim();
 const getOriginPublisher = ($) => {
     return $('#showopublisher').children().map((i, element) => {
         const el = $(element);
-        if (el.text().trim() !== '') {
+        if (el.text().trim() !== '' && el.text().trim() != 'N/A') {
             return {
                 name: el.text().trim(),
                 slug: el.attr('href').split("/")[4].trim(),
@@ -288,7 +295,7 @@ const getEnglishPublisher = ($) => {
 const getRelease = ($) => {
     return $('#myTable > tbody > tr').map((i, element) => {
         const el = $(element);
-        if (el.find('a').first().text()) {
+        if (el.text().trim() !== '' && el.text().trim() != 'N/A') {
             return {
                 date: moment.utc(el.children().first().html(), "MM/DD/YY").toDate(),
                 group: el.find('a').first().text().trim(),
@@ -326,14 +333,12 @@ const getReleasePageMax = ($) => {
  */
 const getPageWithData = async (title, page = 1) => {
 
-    const response = await fetch(`https://www.novelupdates.com/series/${title}/?pg=${page}`)
-        if (response.status >= 400) {
-            throw new Error("Bad response from server")
-        }
-           
-    const body = await response.text()
+    const response = await get(`https://www.novelupdates.com/series/${title}/?pg=${page}`)
+    if (response.statusCode >= 400) {
+        throw new Error("Bad response from server")
+    }
 
-    return cheerio.load(body)
+    return cheerio.load(response.data)
 };
 
 module.exports = getSerieData;
