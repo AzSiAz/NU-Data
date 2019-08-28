@@ -8,6 +8,6 @@ describe('getSearchData', () => {
     }, 1000000)
 
     test('Should fail', async () => {
-        await expect(getSearchData('magic', 35)).rejects.toThrow(/Bad/)
+        await expect(getSearchData('magic', 35)).rejects.toThrow(/Not Found/)
     }, 1000000)
 })

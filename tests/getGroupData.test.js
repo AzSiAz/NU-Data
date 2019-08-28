@@ -3,7 +3,7 @@ const { getGroupData } = require('../src/index')
 
 describe('getGroupData', () => {
     let pageMax
-    
+
     test('Should get data from translation group page', async () => {
         let data = await getGroupData('AbsurdTL')
         expect(data.title).toBe('AbsurdTL')
@@ -17,7 +17,7 @@ describe('getGroupData', () => {
     })
 
     test('Should fail if group doesn\'t exist', async () => {
-        await expect(getGroupData("blblblbblb")).rejects.toThrow(/Bad/)
+        await expect(getGroupData("blblblbblb")).rejects.toThrow(/Not Found/)
     }, 1000000)
 
     test('Should fail if group undefined, null, empty ', async () => {
