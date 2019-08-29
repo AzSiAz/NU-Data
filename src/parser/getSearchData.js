@@ -1,5 +1,5 @@
 // @ts-check
-const { get } = require('httpie');
+const axios = require('axios').default;
 const cheerio = require('cheerio');
 
 /**
@@ -111,8 +111,8 @@ const getCurrentPage = ($) => parseInt($('.page-numbers.current').text());
  * @returns {Promise<CheerioStatic>}
  */
 const getPageWithData = async (word = "", page = 1) => {
-    const response = await get(`https://novelupdates.com/page/${page}/?s=${word}&post_type=seriesplans`)
-    if (response.statusCode >= 400) {
+    const response = await axios(`https://novelupdates.com/page/${page}/?s=${word}&post_type=seriesplans`)
+    if (response.status >= 400) {
         throw new Error("Bad response from server")
     }
 

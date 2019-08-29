@@ -17,7 +17,7 @@ describe('getGroupData', () => {
     })
 
     test('Should fail if group doesn\'t exist', async () => {
-        await expect(getGroupData("blblblbblb")).rejects.toThrow(/Not Found/)
+        await expect(getGroupData("blblblbblb")).rejects.toThrow(/404/)
     }, 1000000)
 
     test('Should fail if group undefined, null, empty ', async () => {

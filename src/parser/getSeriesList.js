@@ -1,6 +1,6 @@
 //@ts-check
 const cheerio = require("cheerio");
-const { get } = require("httpie");
+const axios = require("axios").default;
 const { getPagination } = require("../helpers");
 
 
@@ -67,9 +67,9 @@ const extractData = ($) => ({
  * @returns {Promise<CheerioStatic>}
  */
 const getPageWithData = async (page) => {
-    const res = await get(`https://www.novelupdates.com/novelslisting/?st=1&pg=${page}`);
-    if (res.statusCode >= 400) {
-        throw new Error(res.statusMessage);
+    const res = await axios(`https://www.novelupdates.com/novelslisting/?st=1&pg=${page}`);
+    if (res.status >= 400) {
+        throw new Error(res.statusText);
     }
 
     return cheerio.load(res.data);

@@ -1,6 +1,6 @@
 //@ts-check
 const cheerio = require("cheerio")
-const { get } = require("httpie")
+const axios = require("axios").default
 
 
 /**
@@ -8,10 +8,10 @@ const { get } = require("httpie")
  * @returns {Promise<CheerioStatic>}
  */
 const getPageWithData = async (slug) => {
-    const res = await get(`https://www.novelupdates.com/group/${slug}`);
+    const res = await axios(`https://www.novelupdates.com/group/${slug}`);
 
-    if (res.statusCode >= 400) {
-        throw new Error(res.statusMessage);
+    if (res.status >= 400) {
+        throw new Error(res.statusText);
     }
 
     return cheerio.load(res.data);

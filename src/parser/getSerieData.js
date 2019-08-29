@@ -1,5 +1,5 @@
 // @ts-check
-const { get } = require('httpie');
+const axios = require('axios').default;
 const cheerio = require('cheerio');
 const moment = require('moment');
 
@@ -332,9 +332,8 @@ const getReleasePageMax = ($) => {
  * @returns {Promise<CheerioStatic>}
  */
 const getPageWithData = async (title, page = 1) => {
-
-    const response = await get(`https://www.novelupdates.com/series/${title}/?pg=${page}`)
-    if (response.statusCode >= 400) {
+    const response = await axios(`https://www.novelupdates.com/series/${title}/?pg=${page}`)
+    if (response.status >= 400) {
         throw new Error("Bad response from server")
     }
 
